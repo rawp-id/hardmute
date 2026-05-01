@@ -2,7 +2,7 @@ import os
 import re
 
 def check_noise(filepath):
-    """Checks if a file still contains noise according to Noisecut standards."""
+    """Checks if a file still contains noise according to hardmute standards."""
     if not os.path.exists(filepath):
         print(f"✗ File {filepath} not found.")
         return
@@ -45,5 +45,5 @@ def check_noise(filepath):
             print(f"  - {issue}")
 
 if __name__ == "__main__":
-    print("--- Noisecut Verifier ---")
+    print("--- hardmute Verifier ---")
     check_noise("playground/noisy_app.py")

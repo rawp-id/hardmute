@@ -5,7 +5,7 @@ def add_numbers(a, b):
   return a + b
 
 def greet_user(name):
-  print(f"Hello, {name}! Welcome to the Noisecut test suite.")
+  print(f"Hello, {name}! Welcome to the hardmute test suite.")
 
 if __name__ == "__main__":
   x = 10

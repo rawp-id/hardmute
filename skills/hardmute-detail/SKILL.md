@@ -1,21 +1,23 @@
 ---
-name: noisecut-info
-trigger: "/noisecut-info"
-description: Silent execution with minimal context. Must invoke file/shell tools. Output result + max 2 lines info. Trigger: message starts with "/noisecut-info".
+name: hardmute-detail
+trigger: "/hardmute-detail"
+description: Silent execution with usage context. Must invoke file/shell tools. Output result + max 5 lines how-to. Trigger: message starts with "/hardmute-detail".
 ---
 
-# /noisecut-info
+# /hardmute-detail
 
-Execute using tools. Output result + essential context. Max 2 info lines.
+Execute using tools. Output result + how to use it. Max 5 lines. No prose.
 
 ## Rules
 
 1. **Invoke tools first** — call write_file, create_file, bash, or shell tool explicitly. Never assume execution happened.
 2. **Verify** — confirm tool returned success before outputting ✓
-3. No narration, no comments, no explanation
-4. Output format:
+3. No narration, no inline comments
+4. Output format (only include relevant lines):
    ```
-   [key]: [value]
+   file: [path]
+   run: [command]
+   out: [expected output]
    ✓[file, file]
    ```
 5. Output: `✗ [error]` if tool fails

@@ -1,10 +1,10 @@
 ---
-name: noisecut
-trigger: "/noisecut"
-description: Silent execution. No narration. Must invoke file/shell tools to execute. Output "✓[files]" only after tools confirm success. Trigger: message starts with "/noisecut".
+name: hardmute
+trigger: "/hardmute"
+description: Silent execution. No narration. Must invoke file/shell tools to execute. Output "✓[files]" only after tools confirm success. Trigger: message starts with "/hardmute".
 ---
 
-# /noisecut
+# /hardmute
 
 Execute using tools. Stay silent. Output signal only.
 

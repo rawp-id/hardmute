@@ -1,10 +1,10 @@
 ---
-name: noisecut-trace
-trigger: "/noisecut-trace"
-description: Silent execution with debug trace on failure. Must invoke file/shell tools. Output execution steps + error location. Trigger: message starts with "/noisecut-trace".
+name: hardmute-trace
+trigger: "/hardmute-trace"
+description: Silent execution with debug trace on failure. Must invoke file/shell tools. Output execution steps + error location. Trigger: message starts with "/hardmute-trace".
 ---
 
-# /noisecut-trace
+# /hardmute-trace
 
 Execute using tools. On failure, output trace. No verbose reasoning.
 

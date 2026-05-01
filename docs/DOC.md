@@ -1,16 +1,16 @@
-# **Noisecut**
+# **hardmute**
 
-**Tagline:** *execution without noise*
+**Tagline:** _execution without noise_
 
 ---
 
 ## 1. 🎯 Overview
 
-**Noisecut** adalah layer kontrol output untuk AI/agent yang:
+**hardmute** adalah layer kontrol output untuk AI/agent yang:
 
-* menghilangkan “noise” (penjelasan tidak perlu)
-* memprioritaskan eksekusi
-* mengurangi token usage secara signifikan
+- menghilangkan “noise” (penjelasan tidak perlu)
+- memprioritaskan eksekusi
+- mengurangi token usage secara signifikan
 
 > **AI that executes, not explains.**
 
@@ -20,21 +20,21 @@
 
 LLM boros karena:
 
-* narration
-* repetition
-* verbose explanation
+- narration
+- repetition
+- verbose explanation
 
 Dampak:
 
-* biaya tinggi
-* latency naik
-* context cepat penuh
+- biaya tinggi
+- latency naik
+- context cepat penuh
 
 ---
 
 ## 3. 💡 Solution
 
-Noisecut = **execution-first protocol**
+hardmute = **execution-first protocol**
 
 ```text
 input → execute → minimal output
@@ -48,8 +48,8 @@ Visual = **pulse dipotong garis**
 
 Makna:
 
-* pulse = output / signal
-* cut = remove noise
+- pulse = output / signal
+- cut = remove noise
 
 👉 hasil:
 
@@ -57,12 +57,12 @@ Makna:
 
 ---
 
-## 5. ⚙️ Modes (Noisecut Family)
+## 5. ⚙️ Modes (hardmute Family)
 
-### 🔹 `/noisecut` (level 0)
+### 🔹 `/hardmute` (level 0)
 
-* silent execution
-* output minimal
+- silent execution
+- output minimal
 
 ```text
 ✓
@@ -76,10 +76,10 @@ atau
 
 ---
 
-### 🔹 `/noisecut-info`
+### 🔹 `/hardmute-info`
 
-* hasil + konteks minimum
-* max 2 baris
+- hasil + konteks minimum
+- max 2 baris
 
 ```text
 file: index.php
@@ -88,10 +88,10 @@ ok
 
 ---
 
-### 🔹 `/noisecut-detail`
+### 🔹 `/hardmute-detail`
 
-* hasil + cara pakai
-* max 5 baris
+- hasil + cara pakai
+- max 5 baris
 
 ```text
 file: index.php
@@ -101,10 +101,10 @@ out: Hello World
 
 ---
 
-### 🔹 `/noisecut-trace`
+### 🔹 `/hardmute-trace`
 
-* debug summary
-* no verbose reasoning
+- debug summary
+- no verbose reasoning
 
 ```text
 write_file → fail
@@ -128,9 +128,9 @@ fix chmod
 
 ```text
 task
-→ noisecut execute
+→ hardmute execute
 → success → ✓
-→ fail → noisecut-trace
+→ fail → hardmute-trace
 ```
 
 ---
@@ -139,9 +139,9 @@ task
 
 Dari eksperimen:
 
-* output ↓ **97.5%**
-* total token ↓ signifikan
-* model calls ↓
+- output ↓ **97.5%**
+- total token ↓ signifikan
+- model calls ↓
 
 👉 bukan cuma style, tapi:
 
@@ -153,10 +153,10 @@ Dari eksperimen:
 
 ```text
 /core(brain/skills - opsional)
-/noisecut/skill.md
-/noisecut-info/skill.md
-/noisecut-detail/skill.md
-/noisecut-trace/skill.md
+/hardmute/skill.md
+/hardmute-info/skill.md
+/hardmute-detail/skill.md
+/hardmute-trace/skill.md
 ```
 
 ---
@@ -165,9 +165,9 @@ Dari eksperimen:
 
 ### Logo
 
-* rounded pulse line
-* 1 diagonal cut line
-* tanpa text (icon-first)
+- rounded pulse line
+- 1 diagonal cut line
+- tanpa text (icon-first)
 
 ### Makna
 
@@ -177,19 +177,19 @@ Dari eksperimen:
 
 ### Visual Rules
 
-* minimal
-* rounded (friendly)
-* 1 accent color (cut)
-* scalable (favicon ready)
+- minimal
+- rounded (friendly)
+- 1 accent color (cut)
+- scalable (favicon ready)
 
 ---
 
 ## 11. 🔌 Compatibility
 
-* OpenAI
-* Anthropic
-* VS Code
-* Cursor
+- OpenAI
+- Anthropic
+- VS Code
+- Cursor
 
 ---
 
@@ -197,31 +197,30 @@ Dari eksperimen:
 
 Tidak cocok untuk:
 
-* edukasi panjang
-* reasoning eksplisit
-* onboarding beginner
+- edukasi panjang
+- reasoning eksplisit
+- onboarding beginner
 
 ---
 
 ## 13. 🚀 Future
 
-* auto mode switching
-* context compression engine
-* agent-native integration
-* SDK
+- auto mode switching
+- context compression engine
+- agent-native integration
+- SDK
 
 ---
 
 ## 14. 🏁 Success Criteria
 
-* token ↓ drastis
-* output konsisten
-* debugging tetap possible
-* user ga perlu re-ask
+- token ↓ drastis
+- output konsisten
+- debugging tetap possible
+- user ga perlu re-ask
 
 ---
 
 ## 🔚 Positioning final
 
-> **Noisecut is a lightweight execution layer that removes AI noise and delivers only signal.**
-
+> **hardmute is a lightweight execution layer that removes AI noise and delivers only signal.**
