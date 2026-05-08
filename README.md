@@ -43,15 +43,19 @@ Hardmute:
 
 ## Install
 
-Copy the skill folders into your agent's skills directory:
+### Mac / Linux
 
 ```bash
-# Claude Code
-cp -r hardmute ~/.claude/skills/
-cp -r hardmute-info ~/.claude/skills/
-cp -r hardmute-detail ~/.claude/skills/
-cp -r hardmute-trace ~/.claude/skills/
+curl -sSL https://raw.githubusercontent.com/rawp-id/hardmute/main/install.sh | bash
 ```
+
+### Windows (PowerShell)
+
+```powershell
+powershell -c "irm https://raw.githubusercontent.com/rawp-id/hardmute/main/install.ps1 | iex"
+```
+
+The installation script automatically detects and installs Hardmute to compatible agents (Claude Code, Gemini, Windsurf, Cursor).
 
 Works with any agent that reads instruction/skill markdown files: Claude Code, Cursor, Windsurf, OpenAI Codex, and others.
 
