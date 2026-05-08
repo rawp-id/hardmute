@@ -86,11 +86,11 @@ multi_select() {
 
         # Read key (without -e to prevent exit on read failure)
         set +e
-        IFS= read -rsn1 key
+        IFS= read -rsn1 key < /dev/tty
         
         case "$key" in
             $'\x1b') # Escape sequence
-                read -rsn2 -t 0.1 next_key
+                read -rsn2 -t 0.1 next_key < /dev/tty
                 case "$next_key" in
                     '[A'|'OA') ((current--)) ;; # Up
                     '[B'|'OB') ((current++)) ;; # Down
