@@ -1,72 +1,113 @@
-# Hardmute Multi-Agent Installation Script for Windows
+# Hardmute TUI Multi-Agent Installer for Windows
 # A lightweight execution protocol for AI agents.
 
 $ErrorActionPreference = "Stop"
 
-# Icons and Colors
+# Colors & Icons
 $Check = "v"
+$Unchecked = "o"
+$Checked = "X"
 $Info = "i"
 $XMark = "x"
 $Gear = "*"
 
-Write-Host "========================================" -ForegroundColor Blue
-Write-Host "   Hardmute Multi-Agent Installer (Win)" -ForegroundColor Cyan
-Write-Host "========================================" -ForegroundColor Blue
-
-# Define potential agent skill paths
-$Agents = @{
-    "Antigravity/Gemini" = "$HOME\.gemini\antigravity\skills"
-    "Claude Code"        = "$HOME\.claude\skills"
-    "Windsurf"           = "$HOME\.windsurf\skills"
-    "Cursor (Global)"    = "$HOME\.cursor\skills"
-    "OpenAI Codex"       = "$HOME\.codex\skills"
-    "Other Agents"       = "$HOME\.agents\skills"
+function Show-Header($title) {
+    Write-Host "========================================" -ForegroundColor Blue
+    Write-Host "   $title" -ForegroundColor Cyan
+    Write-Host "========================================" -ForegroundColor Blue
 }
 
+# Define potential agent skill paths
+$Agents = @(
+    @{Name="Antigravity/Gemini"; Path="$HOME\.gemini\antigravity\skills"}
+    @{Name="Claude Code"; Path="$HOME\.claude\skills"}
+    @{Name="Windsurf"; Path="$HOME\.windsurf\skills"}
+    @{Name="Cursor (Global)"; Path="$HOME\.cursor\skills"}
+    @{Name="OpenAI Codex"; Path="$HOME\.codex\skills"}
+    @{Name="Other Agents"; Path="$HOME\.agents\skills"}
+)
+
 $Skills = @("hardmute", "hardmute-info", "hardmute-detail", "hardmute-trace")
-$DetectedTargets = @()
+
+# Detection
+$DetectedAgents = @()
+foreach ($agent in $Agents) {
+    $parentDir = Split-Path $agent.Path -Parent
+    if (Test-Path $parentDir) {
+        $DetectedAgents += $agent
+    }
+}
+
+if ($DetectedAgents.Count -eq 0) {
+    $DetectedAgents += $Agents[0]
+}
+
+# TUI Menu Helper
+function Get-MultiSelection($title, $options) {
+    $selections = @()
+    foreach($o in $options) { $selections += $false }
+    
+    while($true) {
+        Clear-Host
+        Show-Header $title
+        Write-Host "Enter number to toggle, 'a' for all, 'n' for none, or 'Enter' to confirm:`n" -ForegroundColor Gray
+        
+        for($i=0; $i -lt $options.Count; $i++) {
+            $prefix = if ($selections[$i]) { "[X]" } else { "[ ]" }
+            $color = if ($selections[$i]) { "Green" } else { "Gray" }
+            Write-Host "  $($i+1). $prefix $($options[$i])" -ForegroundColor $color
+        }
+        
+        Write-Host "`nSelection: " -NoNewline
+        $input = Read-Host
+        
+        if ($input -eq "") { break }
+        if ($input -eq "a") { for($i=0; $i -lt $options.Count; $i++) { $selections[$i] = $true }; continue }
+        if ($input -eq "n") { for($i=0; $i -lt $options.Count; $i++) { $selections[$i] = $false }; continue }
+        
+        if ([int]::TryParse($input, [ref]$idx)) {
+            if ($idx -gt 0 -and $idx -le $options.Count) {
+                $selections[$idx-1] = -not $selections[$idx-1]
+            }
+        }
+    }
+    return $selections
+}
 
 # Source directory logic
 $SrcDir = Join-Path (Get-Location) "skills"
 if (-not (Test-Path $SrcDir)) {
-    Write-Host "$Info Skills directory not found locally. Attempting remote download..." -ForegroundColor Yellow
+    Clear-Host
+    Write-Host "$Info Skills directory not found. Downloading..." -ForegroundColor Yellow
     $TempDir = Join-Path $env:TEMP ([Guid]::NewGuid().ToString())
     New-Item -ItemType Directory -Path $TempDir | Out-Null
-    
-    try {
-        git clone --depth 1 https://github.com/rawp-id/hardmute.git $TempDir 2>$null
-        $SrcDir = Join-Path $TempDir "skills"
-    } catch {
-        Write-Host "$XMark Error: Git clone failed. Please install Git or run from repo root." -ForegroundColor Red
-        exit 1
-    }
+    git clone --depth 1 https://github.com/rawp-id/hardmute.git $TempDir 2>$null
+    $SrcDir = Join-Path $TempDir "skills"
 }
 
-if (-not (Test-Path $SrcDir)) {
-    Write-Host "$XMark Error: Cannot find 'skills' directory." -ForegroundColor Red
-    exit 1
+# 1. Select Agents
+$agentNames = $DetectedAgents | ForEach-Object { $_.Name }
+$agentSelections = Get-MultiSelection "Select Agents" $agentNames
+
+# 2. Select Skills
+$skillSelections = Get-MultiSelection "Select Skills" $Skills
+
+# Final Installation
+$selectedAgents = @()
+for($i=0; $i -lt $DetectedAgents.Count; $i++) { if($agentSelections[$i]) { $selectedAgents += $DetectedAgents[$i] } }
+
+$selectedSkills = @()
+for($i=0; $i -lt $Skills.Count; $i++) { if($skillSelections[$i]) { $selectedSkills += $Skills[$i] } }
+
+if ($selectedAgents.Count -eq 0 -or $selectedSkills.Count -eq 0) {
+    Write-Host "`n$XMark No agents or skills selected. Aborting." -ForegroundColor Red
+    exit 0
 }
 
-# Detection phase
-Write-Host "Detecting compatible agents..." -ForegroundColor White
-foreach ($name in $Agents.Keys) {
-    $path = $Agents[$name]
-    $parentDir = Split-Path $path -Parent
-    if (Test-Path $parentDir) {
-        Write-Host "  $Check Found $name" -ForegroundColor Green
-        $DetectedTargets += @{Path = $path; Name = $name}
-    }
-}
+Clear-Host
+Show-Header "Installing Hardmute..."
 
-if ($DetectedTargets.Count -eq 0) {
-    Write-Host "$Info No known agents detected. Defaulting to Gemini path." -ForegroundColor Yellow
-    $DetectedTargets += @{Path = $Agents["Antigravity/Gemini"]; Name = "Antigravity/Gemini"}
-}
-
-# Installation phase
-Write-Host "`nStarting installation..." -ForegroundColor White
-
-foreach ($target in $DetectedTargets) {
+foreach ($target in $selectedAgents) {
     Write-Host "`n$Gear Target: $($target.Name)" -ForegroundColor Cyan
     Write-Host "  Path: $($target.Path)"
     
@@ -74,14 +115,12 @@ foreach ($target in $DetectedTargets) {
         New-Item -ItemType Directory -Path $target.Path -Force | Out-Null
     }
     
-    foreach ($skill in $Skills) {
+    foreach ($skill in $selectedSkills) {
         $skillSrc = Join-Path $SrcDir $skill
         if (Test-Path $skillSrc) {
             Write-Host "  Installing $skill... " -NoNewline
             Copy-Item -Path $skillSrc -Destination $target.Path -Recurse -Force
             Write-Host "$Check" -ForegroundColor Green
-        } else {
-            Write-Host "  $XMark Skill '$skill' not found" -ForegroundColor Red
         }
     }
 }
@@ -89,9 +128,4 @@ foreach ($target in $DetectedTargets) {
 Write-Host "`n========================================" -ForegroundColor Blue
 Write-Host "   Multi-Agent Installation Complete!" -ForegroundColor Green
 Write-Host "========================================" -ForegroundColor Blue
-Write-Host "`nYou can now use hardmute modes in your agents:"
-Write-Host "  /hardmute        - Silent execution"
-Write-Host "  /hardmute-info   - Minimal info"
-Write-Host "  /hardmute-detail - Execution details"
-Write-Host "  /hardmute-trace  - Debug on failure"
 Write-Host "`nEnjoy your noise-free execution environment." -ForegroundColor Cyan
