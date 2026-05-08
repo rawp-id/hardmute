@@ -124,12 +124,17 @@ multi_select() {
 }
 
 # Source directory logic
-SRC_DIR="$(pwd)/skills"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" 2>/dev/null && pwd || pwd)"
+SRC_DIR="$SCRIPT_DIR/skills"
+
 if [ ! -d "$SRC_DIR" ]; then
     clear
-    echo -e "${INFO} Skills directory not found. Downloading...${NC}"
+    echo -e "${INFO} Skills directory not found. Downloading from GitHub...${NC}"
     TEMP_DIR=$(mktemp -d)
-    git clone --depth 1 https://github.com/rawp-id/hardmute.git "$TEMP_DIR" > /dev/null 2>&1
+    if ! git clone --depth 1 https://github.com/rawp-id/hardmute.git "$TEMP_DIR"; then
+        echo -e "${RED}${X_MARK} Failed to download skills. Please check your internet connection.${NC}"
+        exit 1
+    fi
     SRC_DIR="$TEMP_DIR/skills"
     trap 'rm -rf "$TEMP_DIR"' EXIT
 fi
