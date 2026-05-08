@@ -1,7 +1,9 @@
 ---
 name: hardmute-trace
+description: >
+  Silent execution with debug trace on failure. Activate when user says: "/hardmute-trace".
+  Must invoke file/shell tools. Output execution steps + error location.
 trigger: "/hardmute-trace"
-description: Silent execution with debug trace on failure. Must invoke file/shell tools. Output execution steps + error location. Trigger: message starts with "/hardmute-trace".
 ---
 
 # /hardmute-trace

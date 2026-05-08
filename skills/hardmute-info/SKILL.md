@@ -1,7 +1,9 @@
 ---
 name: hardmute-info
+description: >
+  Silent execution with minimal context. Activate when user says: "/hardmute-info".
+  Must invoke file/shell tools. Output result + max 2 lines info.
 trigger: "/hardmute-info"
-description: Silent execution with minimal context. Must invoke file/shell tools. Output result + max 2 lines info. Trigger: message starts with "/hardmute-info".
 ---
 
 # /hardmute-info

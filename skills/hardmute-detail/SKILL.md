@@ -1,7 +1,9 @@
 ---
 name: hardmute-detail
+description: >
+  Silent execution with usage context. Activate when user says: "/hardmute-detail".
+  Must invoke file/shell tools. Output result + max 5 lines how-to.
 trigger: "/hardmute-detail"
-description: Silent execution with usage context. Must invoke file/shell tools. Output result + max 5 lines how-to. Trigger: message starts with "/hardmute-detail".
 ---
 
 # /hardmute-detail

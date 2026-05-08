@@ -1,7 +1,10 @@
 ---
 name: hardmute
+description: >
+  Silent execution mode. Activate when user says: "hardmute mode", "silent execute",
+  "silent tool mode", "/hardmute", or requests silent execution without narration.
+  Must invoke file/shell tools to execute. Output "✓[files]" only after tools confirm success.
 trigger: "/hardmute"
-description: Silent execution. No narration. Must invoke file/shell tools to execute. Output "✓[files]" only after tools confirm success. Trigger: message starts with "/hardmute".
 ---
 
 # /hardmute
