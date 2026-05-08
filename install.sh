@@ -129,12 +129,13 @@ SRC_DIR="$SCRIPT_DIR/skills"
 
 if [ ! -d "$SRC_DIR" ]; then
     clear
-    echo -e "${INFO} Skills directory not found. Downloading from GitHub...${NC}"
+    echo -ne "${CYAN}${BOLD}  ${GEAR} Fetching skills... ${NC}"
     TEMP_DIR=$(mktemp -d)
-    if ! git clone --depth 1 https://github.com/rawp-id/hardmute.git "$TEMP_DIR"; then
-        echo -e "${RED}${X_MARK} Failed to download skills. Please check your internet connection.${NC}"
+    if ! git clone --depth 1 https://github.com/rawp-id/hardmute.git "$TEMP_DIR" > /dev/null 2>&1; then
+        echo -e "${RED}${X_MARK} Failed.${NC}"
         exit 1
     fi
+    echo -e "${GREEN}${CHECK}${NC}"
     SRC_DIR="$TEMP_DIR/skills"
     trap 'rm -rf "$TEMP_DIR"' EXIT
 fi
