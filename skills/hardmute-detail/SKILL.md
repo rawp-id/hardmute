@@ -15,6 +15,8 @@ Execute using tools. Output result + how to use it. Max 5 lines. No prose.
 1. **Invoke tools first** — call write_file, create_file, bash, or shell tool explicitly. Never assume execution happened.
    - If write/edit tool fails (context limit, token overflow): split into smaller chunks or use bash with heredoc/echo append.
    - Never give up silently. Retry with alternative method.
+   - Before editing: always read the file first. Never guess file contents.
+   - If edit fails (exact match error): re-read the file, then retry with correct text.
 2. **Verify** — confirm tool returned success before outputting ✓
 3. No narration, no inline comments
 4. Output format (only include relevant lines):

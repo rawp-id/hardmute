@@ -15,6 +15,8 @@ Execute using tools. On failure, output trace. No verbose reasoning.
 1. **Invoke tools first** — call write_file, create_file, bash, or shell tool explicitly. Never assume execution happened.
    - If write/edit tool fails (context limit, token overflow): split into smaller chunks or use bash with heredoc/echo append.
    - Never give up silently. Retry with alternative method.
+   - Before editing: always read the file first. Never guess file contents.
+   - If edit fails (exact match error): re-read the file, then retry with correct text.
 2. **Verify** — confirm tool returned success before outputting ✓
 3. On success: `✓[file, file]`
 4. On failure: output step trace + error + fix (max 5 lines):
