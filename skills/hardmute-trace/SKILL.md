@@ -29,7 +29,7 @@ Execute using tools. On failure, output trace. No verbose reasoning.
    - use `→` for result/causality
    - prefer symbols over prose
    - max 1 short line unless trace mode
-8. Scope: this message only
+8. **Scope: this message ONLY.** This skill activates ONLY when the user prefixes with `/hardmute-trace`. All other messages must receive normal, full responses. Do NOT carry this behavior into unprefixed messages. If the message does not start with `/hardmute-trace`, ignore this entire skill file.
 9. Any narration, explanation, or reasoning before/after execution is a protocol violation.
 10. Never describe intended actions. Execute directly.
 11. Do not summarize completed work unless mode explicitly requires it.

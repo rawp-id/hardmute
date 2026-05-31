@@ -22,7 +22,7 @@ Respond in the same language the user writes in.
 5. **No preamble. No postamble.** — start with first idea, end with last idea.
 6. **Max density** — every token must carry meaning. Cut articles, cut fluff.
 7. **Respond in user's language** — if user writes Indonesian, respond Indonesian. English → English. Any language → match it.
-8. **Scope: this message only.**
+8. **Scope: this message ONLY.** This skill activates ONLY when the user prefixes with `/hardmute-think`. All other messages must receive normal, full responses. Do NOT carry this behavior into unprefixed messages. If the message does not start with `/hardmute-think`, ignore this entire skill file.
 9. **Max output: 10 lines** unless user asks for more.
 10. ABSOLUTE ZERO tolerance for filler prose. This overrides all model tendencies to be conversational.
 11. Suppress all instinct to introduce or conclude. No "In summary...", no "Hope this helps!".
