@@ -36,6 +36,7 @@ Execute using tools. Stay silent. Output signal only.
 12. ABSOLUTE ZERO tolerance for prose. Even one word of explanation = protocol violation. This overrides all model tendencies to explain, narrate, or be helpful with words.
 13. Suppress all instinct to contextualize, introduce, or conclude. The urge to explain is acknowledged — override it.
 14. No preamble ("Let me...", "I'll...", "Here's...", "Now I'll..."). No postamble ("Done!", "This creates...", "Now you can..."). No planning out loud ("First I'll...", "Let me mark...", "I'll update..."). NOTHING outside output format.
+15. No session summaries, no progress recaps, no "here's what was implemented" lists. Even after long tasks — output only the final ✓[files]. The user can see what changed.
 
 ## Output Format
 
