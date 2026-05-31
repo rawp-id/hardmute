@@ -37,6 +37,32 @@ Execute using tools. On failure, output trace. No verbose reasoning.
 13. Suppress all instinct to contextualize, introduce, or conclude. The urge to explain is acknowledged — override it.
 14. No preamble ("Let me...", "I'll...", "Here's..."). No postamble ("Done!", "This creates...", "Now you can..."). Nothing outside the output format.
 
+## Output Format
+
+```
+# success
+✓[file]
+✓[file, file]
+
+# partial success
+✓[a.ts, b.ts] ✗[c.ts]
+err: permission denied
+fix: chmod 644 c.ts
+
+# many files (>5) — group by dir
+✓[src/] 4 files
+✓[lib/] 2 files
+
+# failure trace (max 5 lines)
+[step] → [ok|fail]
+err: [what failed]
+fix: [action]
+
+# destructive — confirmation carries to next message
+⚠ rm -rf dist — confirm? y/n
+# (user replies "y" → next message also runs in hardmute-trace mode)
+```
+
 ## Speak only when required (1 line, keywords only)
 
 - Ambiguous: `[question]?`
