@@ -29,18 +29,8 @@ $Agents = @(
 
 $Skills = @("hardmute", "hardmute-info", "hardmute-detail", "hardmute-trace")
 
-# Detection
-$DetectedAgents = @()
-foreach ($agent in $Agents) {
-    $parentDir = Split-Path $agent.Path -Parent
-    if (Test-Path $parentDir) {
-        $DetectedAgents += $agent
-    }
-}
-
-if ($DetectedAgents.Count -eq 0) {
-    $DetectedAgents += $Agents[0]
-}
+# All agents available (directories created on install)
+$DetectedAgents = $Agents
 
 # TUI Menu Helper
 function Get-MultiSelection($title, $options) {
@@ -61,7 +51,15 @@ function Get-MultiSelection($title, $options) {
         Write-Host "`nSelection: " -NoNewline
         $input = Read-Host
         
-        if ($input -eq "") { break }
+        if ($input -eq "") {
+            # If nothing selected, select first item as default
+            $hasSelection = $false
+            foreach ($s in $selections) { if ($s) { $hasSelection = $true; break } }
+            if (-not $hasSelection) {
+                $selections[0] = $true
+            }
+            break
+        }
         if ($input -eq "a") { for($i=0; $i -lt $options.Count; $i++) { $selections[$i] = $true }; continue }
         if ($input -eq "n") { for($i=0; $i -lt $options.Count; $i++) { $selections[$i] = $false }; continue }
         

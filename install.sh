@@ -30,22 +30,9 @@ AGENT_NAMES=("Antigravity/Gemini" "Claude Code" "Windsurf" "Cursor (Global)" "Op
 AGENT_PATHS=("$HOME/.gemini/antigravity/skills" "$HOME/.claude/skills" "$HOME/.windsurf/skills" "$HOME/.cursor/skills" "$HOME/.codex/skills" "$HOME/.agents/skills")
 SKILLS=("hardmute" "hardmute-info" "hardmute-detail" "hardmute-trace")
 
-# Detection
-DETECTED_NAMES=()
-DETECTED_PATHS=()
-
-for i in "${!AGENT_NAMES[@]}"; do
-    if [ -d "$(dirname "${AGENT_PATHS[$i]}")" ]; then
-        DETECTED_NAMES+=("${AGENT_NAMES[$i]}")
-        DETECTED_PATHS+=("${AGENT_PATHS[$i]}")
-    fi
-done
-
-# Fallback if none detected
-if [ ${#DETECTED_NAMES[@]} -eq 0 ]; then
-    DETECTED_NAMES=("Antigravity/Gemini")
-    DETECTED_PATHS=("$HOME/.gemini/antigravity/skills")
-fi
+# All agents available (directories created on install)
+DETECTED_NAMES=("${AGENT_NAMES[@]}")
+DETECTED_PATHS=("${AGENT_PATHS[@]}")
 
 # TUI Menu Helper
 # Usage: multi_select "Title" "OptionsArray" "SelectionsArray"
@@ -103,7 +90,14 @@ multi_select() {
                     selections[$current]=1
                 fi
                 ;;
-            "") # Enter
+            "") # Enter — confirm if any selected, otherwise select current + confirm
+                local has_selection=0
+                for s in "${selections[@]}"; do
+                    if [ "$s" == "1" ]; then has_selection=1; break; fi
+                done
+                if [ $has_selection -eq 0 ]; then
+                    selections[$current]=1
+                fi
                 set -e
                 break
                 ;;

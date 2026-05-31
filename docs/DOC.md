@@ -4,7 +4,7 @@
 
 ---
 
-## 1. 🎯 Overview
+## 1. Overview
 
 **hardmute** adalah layer kontrol output untuk AI/agent yang:
 
@@ -16,7 +16,7 @@
 
 ---
 
-## 2. 🧠 Problem
+## 2. Problem
 
 LLM boros karena:
 
@@ -32,7 +32,7 @@ Dampak:
 
 ---
 
-## 3. 💡 Solution
+## 3. Solution
 
 hardmute = **execution-first protocol**
 
@@ -42,7 +42,7 @@ input → execute → minimal output
 
 ---
 
-## 4. 🧩 Core Concept
+## 4. Core Concept
 
 Visual = **pulse dipotong garis**
 
@@ -51,13 +51,13 @@ Makna:
 - pulse = output / signal
 - cut = remove noise
 
-👉 hasil:
+hasil:
 
 > **clean signal only**
 
 ---
 
-## 5. ⚙️ Modes (hardmute Family)
+## 5. Modes (hardmute Family)
 
 ### 🔹 `/hardmute` (level 0)
 
@@ -114,7 +114,7 @@ fix chmod
 
 ---
 
-## 6. 🧠 Design Principles
+## 6. Design Principles
 
 1. **Execution > explanation**
 2. **Signal > noise**
@@ -124,7 +124,7 @@ fix chmod
 
 ---
 
-## 7. 🔁 Flow
+## 7. Flow
 
 ```text
 task
@@ -135,7 +135,7 @@ task
 
 ---
 
-## 8. 📊 Proven Impact
+## 8. Proven Impact
 
 Dari eksperimen:
 
@@ -143,13 +143,13 @@ Dari eksperimen:
 - total token ↓ signifikan
 - model calls ↓
 
-👉 bukan cuma style, tapi:
+bukan cuma style, tapi:
 
 > **system efficiency improvement**
 
 ---
 
-## 9. 🧬 Architecture
+## 9. Architecture
 
 ```text
 /core(brain/skills - opsional)
@@ -161,7 +161,7 @@ Dari eksperimen:
 
 ---
 
-## 10. 🎨 Brand & Identity
+## 10. Brand & Identity
 
 ### Logo
 
@@ -184,7 +184,7 @@ Dari eksperimen:
 
 ---
 
-## 11. 🔌 Compatibility
+## 11. Compatibility
 
 - OpenAI
 - Anthropic
@@ -193,7 +193,7 @@ Dari eksperimen:
 
 ---
 
-## 12. ⚠️ Constraints
+## 12. Constraints
 
 Tidak cocok untuk:
 
@@ -203,7 +203,7 @@ Tidak cocok untuk:
 
 ---
 
-## 13. 🚀 Future
+## 13. Future
 
 - auto mode switching
 - context compression engine
@@ -212,7 +212,7 @@ Tidak cocok untuk:
 
 ---
 
-## 14. 🏁 Success Criteria
+## 14. Success Criteria
 
 - token ↓ drastis
 - output konsisten
@@ -221,6 +221,6 @@ Tidak cocok untuk:
 
 ---
 
-## 🔚 Positioning final
+## Positioning final
 
 > **hardmute is a lightweight execution layer that removes AI noise and delivers only signal.**
