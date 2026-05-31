@@ -28,7 +28,7 @@ ARROW="➜"
 # Setup
 AGENT_NAMES=("Antigravity/Gemini" "Claude Code" "Windsurf" "Cursor (Global)" "OpenAI Codex" "Other Agents")
 AGENT_PATHS=("$HOME/.gemini/antigravity/skills" "$HOME/.claude/skills" "$HOME/.windsurf/skills" "$HOME/.cursor/skills" "$HOME/.codex/skills" "$HOME/.agents/skills")
-SKILLS=("hardmute" "hardmute-info" "hardmute-detail" "hardmute-trace")
+SKILLS=("hardmute" "hardmute-info" "hardmute-detail" "hardmute-trace" "hardmute-think")
 
 # All agents available (directories created on install)
 DETECTED_NAMES=("${AGENT_NAMES[@]}")

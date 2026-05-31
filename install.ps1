@@ -27,7 +27,7 @@ $Agents = @(
     @{Name="Other Agents"; Path="$HOME\.agents\skills"}
 )
 
-$Skills = @("hardmute", "hardmute-info", "hardmute-detail", "hardmute-trace")
+$Skills = @("hardmute", "hardmute-info", "hardmute-detail", "hardmute-trace", "hardmute-think")
 
 # All agents available (directories created on install)
 $DetectedAgents = $Agents

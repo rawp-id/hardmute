@@ -178,6 +178,25 @@ fix: chmod 755 /var/www
 
 ---
 
+### `/hardmute-think` — brainstorming
+
+No code, no execution. Pure ideas in compressed format. Responds in your language.
+
+```
+/hardmute-think best approach for auth in mobile app?
+```
+
+```
+→ OAuth2 + PKCE, not implicit flow
+→ token in secure storage (Keychain/Keystore)
+→ refresh token rotation, revoke on logout
+→ biometric unlock → decrypt local token
+⚠ avoid: localStorage/SharedPreferences plain
+? need offline access? affects architecture
+```
+
+---
+
 ## How It Works
 
 Each mode is a self-contained `SKILL.md` file. No shared core, no global state, no runtime dependency.
