@@ -256,22 +256,6 @@ When hardmute writes or edits code:
 
 ---
 
-## Hardmute vs Caveman
-
-[Caveman](https://github.com/JuliusBrussee/caveman) compresses AI narration into terse speech (~75% saving). Hardmute eliminates narration entirely.
-
-|                | Caveman | Hardmute |
-|----------------|---------|----------|
-| Approach | Compress output | Silence output |
-| Best for | Explanation tasks | Execution tasks |
-| Output style | Terse language | Signal only |
-| When it speaks | Always (compressed) | Only when required |
-| Token saving | ~75% | ~97% |
-
-They compose well — hardmute uses caveman-style formatting for the rare cases it must communicate (errors, clarifications).
-
----
-
 ## License
 
 [MIT](LICENSE)
