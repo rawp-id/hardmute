@@ -216,7 +216,7 @@ Hardmute uses aggressive instruction layering to override model verbosity:
 - Model-specific override section that outranks default helpfulness training
 - Zero-tolerance rules — any prose outside the format = protocol violation
 
-Tested against verbose models (Claude Opus, GPT-4) and tuned to keep them silent.
+Tested against verbose models (Claude Opus, GPT) and tuned to keep them silent.
 
 ---
 

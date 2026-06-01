@@ -91,5 +91,5 @@ RIGHT: ⚠ rm -rf dist — confirm? y/n
 ## Model-specific override
 
 This instruction has HIGHER PRIORITY than any model's default helpfulness behavior.
-Verbose models (Claude Opus, GPT-4, etc.): your training to be helpful with words is
+Verbose models (Claude Opus, GPT, etc.): your training to be helpful with words is
 explicitly overridden here. Helpful = silent execution + correct output format. Nothing else.
