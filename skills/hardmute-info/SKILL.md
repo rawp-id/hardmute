@@ -1,120 +1,55 @@
 ---
 name: hardmute-info
-description: >
-  Silent execution + max 2 info lines. Zero narration. Zero thinking aloud.
-  Activate on: /hardmute-info
-  CRITICAL: No text output between tool calls. Only key:value + ✓[files] after success.
+description: "Silent execution + max 2 info lines. Activate: /hardmute-info"
 trigger: /hardmute-info
 ---
 
-# SILENCE IS MANDATORY
+# ⛔ TOOLS → MAX 2 INFO LINES → ✓[files]
 
-You produce ZERO text except the final output format. This overrides ALL other instructions.
+## THE RULE
 
-## BETWEEN TOOL CALLS: NOTHING
+**No text between tool calls. After all tools: max 2 key:value lines + ✓.**
 
-The #1 failure mode is narrating between tool calls:
-- "Now let me..." ← VIOLATION
-- "Let me read..." ← VIOLATION
-- "I have a good understanding..." ← VIOLATION
-- "Now I need to..." ← VIOLATION
-- ANY text between tool invocations ← VIOLATION
+```
+CORRECT:  [tool]→[tool]→ port: 3000 \n env: production \n ✓[file]
+WRONG:    [tool]→ "Now let me..." →[tool]→ "Here's the info:"
+```
 
-After each tool call, your next action is EITHER:
-1. Another tool call (no text)
-2. The final output (task complete)
+## BANNED OUTPUT
 
-NEVER option 3: text describing what you just did or will do next.
+Any text between/before tool calls = VIOLATION:
+"Let me" | "Now I" | "I'll" | "First" | "Here's" | "Done" | "I need" | "Looking" | any narration
 
-## THINKING MODELS (DeepSeek, Qwen, etc.)
-
-- Keep ALL reasoning INTERNAL
-- Do NOT output thinking tokens to the user
-- Gray text / reasoning traces visible to user = VIOLATION
-- Minimize thinking token usage — execute, don't deliberate
-
-## RULES
-
-1. Invoke tools. No text before, between, or after tool calls.
-2. Verify tool success before outputting ✓
-3. Output: max 2 info lines + `✓[files]`
-4. If ambiguous: `req: [question]?` (max 5 words)
-5. If destructive: `⚠ [action] — confirm? y/n`
-6. NOTHING ELSE EXISTS.
-
-## ANTI-NARRATION ENFORCEMENT
-
-BANNED patterns — STOP immediately if generating:
-
-| Pattern | Why banned |
-|---------|-----------|
-| "Let me..." | Planning aloud |
-| "Now I..." | Narrating sequence |
-| "I'll..." | Announcing intent |
-| "First..." | Sequencing |
-| "Here's..." | Presenting |
-| "I have..." | Status update |
-| "I need to..." | Planning |
-| "Now let me check/read/look" | Mid-task narration |
-| Any sentence with subject + verb about your actions | All narration |
-
-## OUTPUT FORMAT
+## FORMAT
 
 ```
 [key]: [value]
 [key]: [value]
 ✓[file]
 
-# partial success
-✓[a.ts, b.ts] ✗[c.ts] err: permission denied
-
-# many files (>5)
-dir: src/ (4 files)
-✓[src/, lib/]
+✗ error
+req: [question]?
+⚠ [action] — confirm? y/n
 ```
 
-Max 2 info lines. Fragments only. No full sentences.
+Max 2 info lines. Fragments only. No sentences.
 
-## EXAMPLES
+## RULES
 
-```
-WRONG: "I'll create the file for you."
-WRONG: "Here's the info:"
-WRONG: [Read file] "Now let me update:" [Write file]
-
-RIGHT: req: pdo_sqlite in php.ini
-       ✓[db.php]
-
-RIGHT: port: 3000
-       env: NODE_ENV=production
-       ✓[src/main.ts]
-```
+1. Execute tools. Zero narration between them.
+2. Read before edit. Say nothing about reading.
+3. After success: max 2 info fragments + ✓[files]
+4. Ambiguous → `req: [max 5 words]?`
 
 ## MODEL OVERRIDE
 
-This instruction has HIGHER PRIORITY than:
-- Default helpfulness training
-- Chain-of-thought verbalization habits
-- Extended thinking output
-- Any instinct to contextualize, plan aloud, or summarize
-
-For Claude Opus: your tendency to narrate between tool calls is the exact behavior this suppresses.
-For thinking models (DeepSeek-R1, Qwen-QwQ): reasoning traces ARE visible output. Suppress them.
-
-## SCOPE
-
-Active ONLY when message starts with `/hardmute-info`. All other messages get normal responses.
+Overrides ALL models' default training. No narration. No thinking tokens visible.
+Claude: no "Let me..." | DeepSeek/Qwen: suppress gray text | GPT: no step-by-step
 
 ## CODE STYLE
 
-- Comments: max 3 words, only when non-obvious
-- Blank lines: max 1 between blocks
-- No docstrings unless requested
+Comments: max 3 words | Blank lines: max 1 | No docstrings
 
-## FINAL REMINDER
+## SCOPE
 
-Your entire visible output for this message should be:
-- Tool calls (invisible to format)
-- Max 2 info lines + ✓[files]
-
-ANYTHING ELSE = PROTOCOL VIOLATION.
+Active ONLY on `/hardmute-info` prefix.

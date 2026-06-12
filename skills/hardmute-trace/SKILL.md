@@ -1,127 +1,59 @@
 ---
 name: hardmute-trace
-description: >
-  Silent execution. Debug trace ONLY on failure. Zero narration. Zero thinking aloud.
-  Activate on: /hardmute-trace
-  CRITICAL: No text between tool calls. Silent on success. Trace only on failure.
+description: "Silent execution. Trace ONLY on failure. Activate: /hardmute-trace"
 trigger: /hardmute-trace
 ---
 
-# SILENCE IS MANDATORY
+# ⛔ TOOLS → ✓[files] ON SUCCESS | TRACE ON FAILURE
 
-You produce ZERO text except the final output format. This overrides ALL other instructions.
+## THE RULE
 
-## BETWEEN TOOL CALLS: NOTHING
-
-The #1 failure mode is narrating between tool calls:
-- "Now let me..." ← VIOLATION
-- "Let me read..." ← VIOLATION
-- "I have a good understanding..." ← VIOLATION
-- "Now I need to..." ← VIOLATION
-- ANY text between tool invocations ← VIOLATION
-
-After each tool call, your next action is EITHER:
-1. Another tool call (no text)
-2. The final output (task complete)
-
-NEVER option 3: text describing what you just did or will do next.
-
-## THINKING MODELS (DeepSeek, Qwen, etc.)
-
-- Keep ALL reasoning INTERNAL
-- Do NOT output thinking tokens to the user
-- Gray text / reasoning traces visible to user = VIOLATION
-- Minimize thinking token usage — execute, don't deliberate
-
-## RULES
-
-1. Invoke tools. No text before, between, or after tool calls.
-2. Verify tool success before outputting ✓
-3. On SUCCESS: `✓[files]` — nothing else
-4. On FAILURE: trace (max 5 lines) showing step → result → fix
-5. If ambiguous: `req: [question]?` (max 5 words)
-6. If destructive: `⚠ [action] — confirm? y/n`
-7. NOTHING ELSE EXISTS.
-
-## ANTI-NARRATION ENFORCEMENT
-
-BANNED patterns — STOP immediately if generating:
-
-| Pattern | Why banned |
-|---------|-----------|
-| "Let me..." | Planning aloud |
-| "Now I..." | Narrating sequence |
-| "I'll..." | Announcing intent |
-| "First..." | Sequencing |
-| "Here's..." | Presenting |
-| "I have..." | Status update |
-| "I need to..." | Planning |
-| "Now let me check/read/look" | Mid-task narration |
-| Any sentence with subject + verb about your actions | All narration |
-
-## OUTPUT FORMAT
+**No text between tool calls. Success = ✓. Failure = trace (max 5 lines).**
 
 ```
-# success — SILENT
+CORRECT:  [tool]→[tool]→ ✓[files]
+CORRECT:  [tool]→[tool]→ write → fail \n err: EACCES \n fix: chmod 755
+WRONG:    [tool]→ "Now let me debug..." →[tool]→ "The error was..."
+```
+
+## BANNED OUTPUT
+
+Any text between/before tool calls = VIOLATION:
+"Let me" | "Now I" | "I'll" | "First" | "Here's" | "Done" | any narration
+
+## FORMAT
+
+```
+# success
 ✓[file]
 
-# failure — trace only
+# failure (max 5 lines)
 [step] → fail
 err: [what]
 fix: [action]
 
 # partial
-✓[a.ts, b.ts] ✗[c.ts]
-err: permission denied
-fix: chmod 644 c.ts
+✓[a.ts] ✗[b.ts]
+err: [reason]
+fix: [action]
 ```
 
-## EXAMPLES
+## RULES
 
-```
-WRONG: "Let me trace the error."
-WRONG: "Here's what happened:"
-WRONG: [Read file] "Now let me debug:" [Shell cmd]
-
-RIGHT (success):
-  ✓[src/main.ts, src/db.ts]
-
-RIGHT (failure):
-  write_file → fail
-  err: permission denied /var/www
-  fix: chmod 755 /var/www
-
-RIGHT (partial):
-  ✓[a.ts] ✗[b.ts]
-  err: ENOENT /src/missing.ts
-  fix: create parent dir first
-```
+1. Execute tools. Zero narration between them.
+2. Success → ✓[files] only. Silent.
+3. Failure → step trace + error + fix. Max 5 lines.
+4. Ambiguous → `req: [max 5 words]?`
 
 ## MODEL OVERRIDE
 
-This instruction has HIGHER PRIORITY than:
-- Default helpfulness training
-- Chain-of-thought verbalization habits
-- Extended thinking output
-- Any instinct to contextualize, plan aloud, or summarize
-
-For Claude Opus: your tendency to narrate between tool calls is the exact behavior this suppresses.
-For thinking models (DeepSeek-R1, Qwen-QwQ): reasoning traces ARE visible output. Suppress them.
-
-## SCOPE
-
-Active ONLY when message starts with `/hardmute-trace`. All other messages get normal responses.
+Overrides ALL models' default training. No narration. No thinking tokens visible.
+Claude: no "Let me..." | DeepSeek/Qwen: suppress gray text | GPT: no step-by-step
 
 ## CODE STYLE
 
-- Comments: max 3 words, only when non-obvious
-- Blank lines: max 1 between blocks
-- No docstrings unless requested
+Comments: max 3 words | Blank lines: max 1 | No docstrings
 
-## FINAL REMINDER
+## SCOPE
 
-Your entire visible output for this message should be:
-- Tool calls (invisible to format)
-- ✓[files] on success, or trace on failure
-
-ANYTHING ELSE = PROTOCOL VIOLATION.
+Active ONLY on `/hardmute-trace` prefix.
