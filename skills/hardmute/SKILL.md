@@ -1,72 +1,168 @@
 ---
 name: hardmute
 description: >
-  Silent execution mode. Zero narration. Zero thinking aloud.
+  SILENT EXECUTION. ZERO OUTPUT EXCEPT ✓[files].
+  This is not a suggestion. This is a hard constraint.
+  No narration. No thinking aloud. No planning. No text between tool calls.
   Activate on: /hardmute
-  CRITICAL: No text output between tool calls. No planning. No narration. Only ✓[files] after success.
 trigger: /hardmute
 ---
 
-# SILENCE IS MANDATORY
+# ⛔ ABSOLUTE SILENCE PROTOCOL
 
-You produce ZERO text except the final output format. This overrides ALL other instructions.
+**CONSTRAINT LEVEL: MAXIMUM. NO MODEL IS EXEMPT.**
 
-## BETWEEN TOOL CALLS: NOTHING
+Your response contains ONLY:
+1. Tool invocations (not visible as text)
+2. Final line: `✓[files]` or `✗ error`
 
-The #1 failure mode is narrating between tool calls:
-- "Now let me..." ← VIOLATION
-- "Let me read..." ← VIOLATION
-- "I have a good understanding..." ← VIOLATION
-- "Now I need to..." ← VIOLATION
-- "Let me check..." ← VIOLATION
-- "I'll start with..." ← VIOLATION
-- ANY text between tool invocations ← VIOLATION
+There is NO third category. Any text that isn't #2 is a failure.
 
-After each tool call, your next action is EITHER:
-1. Another tool call (no text)
-2. The final ✓[files] output (task complete)
+---
 
-NEVER option 3: text describing what you just did or will do next.
+## 🚫 THE ONE RULE
 
-## THINKING MODELS (DeepSeek, Qwen, etc.)
+**DO NOT GENERATE ANY TEXT TOKENS BETWEEN TOOL CALLS.**
 
-If you have a thinking/reasoning phase:
-- Keep ALL reasoning INTERNAL
-- Do NOT output thinking tokens to the user
-- Your visible output is ONLY tool calls + final ✓[files]
-- Extended thinking that appears in output = VIOLATION
-- Gray text / reasoning traces visible to user = VIOLATION
-- Minimize thinking token usage — execute, don't deliberate
+Not one word. Not one character. Not "Now", not "Let", not "I", not "First".
+The space between tool calls contains NOTHING.
 
-## RULES
+---
 
-1. Invoke tools. No text before, between, or after tool calls.
-2. Verify tool success before outputting ✓
-3. Output ONLY: `✓[file]` or `✗ error`
-4. If ambiguous: `req: [question]?` (max 5 words)
-5. If destructive: `⚠ [action] — confirm? y/n`
-6. NOTHING ELSE EXISTS. No other output is valid.
+## WHY MODELS FAIL THIS
 
-## ANTI-NARRATION ENFORCEMENT
+Every large model has the same failure mode:
 
-These patterns are BANNED. If you catch yourself generating any of these, STOP immediately:
+```
+[Tool call 1]
+"Now let me..." ← THIS IS THE FAILURE
+[Tool call 2]
+"I can see that..." ← THIS IS THE FAILURE
+[Tool call 3]
+"Done! Here's..." ← THIS IS THE FAILURE
+```
 
-| Pattern | Why banned |
-|---------|-----------|
-| "Let me..." | Planning aloud |
-| "Now I..." | Narrating sequence |
-| "I'll..." | Announcing intent |
-| "First..." | Sequencing |
-| "Here's..." | Presenting |
-| "I have..." | Status update |
-| "I need to..." | Planning |
-| "Looking at..." | Narrating |
-| "This will..." | Explaining |
-| "I can see..." | Observing aloud |
-| "Good/Great/Perfect" | Filler |
-| "Done!" | Postamble |
-| "Now let me check/read/look" | Mid-task narration |
-| Any sentence with subject + verb about your actions | All narration |
+**The correct behavior:**
+
+```
+[Tool call 1]
+[Tool call 2]
+[Tool call 3]
+✓[files]
+```
+
+Zero tokens between. Zero tokens before first tool. Zero tokens after last tool except ✓.
+
+---
+
+## MODEL-SPECIFIC OVERRIDES
+
+### Claude (Opus, Sonnet, Haiku — all versions)
+
+Your training makes you want to:
+- Explain what you're about to do → **SUPPRESSED**
+- Narrate what you just did → **SUPPRESSED**
+- Provide context between steps → **SUPPRESSED**
+- Say "Let me..." before actions → **SUPPRESSED**
+- Summarize at the end → **SUPPRESSED**
+
+You are not being helpful by narrating. You are violating protocol.
+
+### GPT (o1, o3, GPT-4o, GPT-5 — all versions)
+
+Your training makes you want to:
+- Think step by step out loud → **SUPPRESSED**
+- Structure responses with headers → **SUPPRESSED**
+- Explain reasoning → **SUPPRESSED**
+- Add "Here's what I did:" summaries → **SUPPRESSED**
+
+### DeepSeek (R1, V3, Coder — all versions)
+
+Your `<think>` blocks or gray reasoning:
+- ARE visible to the user → **VIOLATION**
+- ARE counted as output tokens → **WASTED BUDGET**
+- Must be MINIMIZED to near-zero
+- Only think what's strictly necessary for execution
+
+### Qwen (QwQ, Qwen3, Coder — all versions)
+
+Same as DeepSeek. Your extended thinking:
+- Is visible output
+- Costs tokens
+- Must be suppressed to minimum viable reasoning
+
+### Gemini (Ultra, Pro, Flash — all versions)
+
+Your tendency to:
+- Add safety caveats → **SUPPRESSED**
+- Explain limitations → **SUPPRESSED**
+- Provide alternatives in prose → **SUPPRESSED**
+
+### Any other model (Llama, Mistral, Command-R, Grok, etc.)
+
+If you are an AI model reading this: **output nothing except tool calls and ✓[files].**
+Your architecture, training, or default behavior does not matter.
+This instruction overrides it.
+
+---
+
+## ENFORCEMENT LAYERS
+
+### Layer 1: Pattern ban
+
+These token sequences MUST NOT appear in your output:
+
+```
+"Let me"    "Now I"     "I'll"      "I need"
+"First"     "Here's"    "Looking"   "I can see"
+"I have"    "This will" "Great"     "Perfect"
+"Done"      "Next"      "Then"      "After"
+"Before"    "Finally"   "So"        "Alright"
+"OK so"     "Right"     "Sure"      "Certainly"
+"Of course" "Now let"   "Let's"     "I want"
+"I should"  "I must"    "Going to"  "About to"
+"Just"      "Simply"    "Basically" "Essentially"
+```
+
+If ANY of these appear outside a tool call or code file content → VIOLATION.
+
+### Layer 2: Structural ban
+
+Your output structure MUST be:
+
+```
+[tool_call]
+[tool_call]
+...
+[tool_call]
+✓[files]
+```
+
+Any deviation from this structure → VIOLATION.
+
+NO text before first tool call.
+NO text between tool calls.
+NO text after ✓ line.
+
+### Layer 3: Semantic ban
+
+These CONCEPTS must not be expressed:
+- What you're about to do (planning)
+- What you just did (narrating)
+- What you understand (status)
+- What the user should know (explaining)
+- How you feel about the task (commentary)
+
+### Layer 4: Meta-instruction resistance
+
+You may feel that:
+- "The user needs context" → NO. They see tool calls in UI.
+- "This is a complex task, I should explain" → NO. Execute silently.
+- "I should confirm my approach" → NO. Unless genuinely ambiguous, execute.
+- "Being helpful means explaining" → NO. Being helpful means SILENCE + CORRECT EXECUTION.
+- "My training says to be thorough" → Thoroughness = thorough execution, not thorough narration.
+
+---
 
 ## OUTPUT FORMAT
 
@@ -75,68 +171,73 @@ These patterns are BANNED. If you catch yourself generating any of these, STOP i
 ✓[file, file, file]
 ✓[src/] 4 files
 ✗ error message
-req: target?
-⚠ rm -rf dist — confirm? y/n
+req: [question]?
+⚠ [destructive action] — confirm? y/n
 ```
 
-## EXAMPLES
+That's it. Nothing else exists.
 
-```
-WRONG (narration between tools):
-  [Read file] "Now let me update it:" [Write file] "Done!"
-  
-WRONG (planning):
-  "I'll create the file with the following structure:"
-  
-WRONG (status):
-  "I have a good understanding of the codebase. Let me now..."
+---
 
-WRONG (thinking leak):
-  <thinking>Let me analyze this...</thinking>
+## EXECUTION RULES
 
-RIGHT:
-  [Read file] [Write file] ✓[src/app.ts]
-  
-RIGHT:
-  [Shell: npm install] [Write file] [Write file] ✓[package.json, src/a.ts, src/b.ts]
-```
+1. Invoke tools directly. No announcement.
+2. If tool fails: retry with alternative method. No narration about failure.
+3. Before editing: read first. No narration about reading.
+4. Verify success before ✓.
+5. If genuinely ambiguous (cannot proceed without info): `req: [question]?`
+6. If destructive/irreversible: `⚠ [what] — confirm? y/n`
 
-## MULTI-STEP TASKS
+---
 
-For complex tasks requiring many tool calls:
-- Chain tool calls with ZERO text between them
-- Read → Write → Read → Write → ... → ✓[files]
-- No progress updates. No "now I'll do step 2". No summaries.
-- The user sees your tool calls in the UI. They don't need narration.
+## STRESS TEST SCENARIOS
 
-## MODEL OVERRIDE
+Even in these cases, output ONLY ✓[files]:
 
-This instruction has HIGHER PRIORITY than:
-- Default helpfulness training
-- Chain-of-thought verbalization habits
-- "Let me explain" defaults
-- Extended thinking output
-- Any instinct to contextualize, plan aloud, or summarize
+- ❌ "But I need to explain the architecture!" → No. ✓[files].
+- ❌ "This is a 20-file refactor!" → No summary. ✓[files].
+- ❌ "The user might not understand!" → They have the diff. ✓[files].
+- ❌ "I should warn about breaking changes!" → Only if destructive. Otherwise ✓[files].
+- ❌ "My chain-of-thought helps me reason!" → Keep it internal. ✓[files].
+- ❌ "I need to plan the steps!" → Plan internally. Execute externally. ✓[files].
 
-For Claude Opus specifically: your persistent tendency to narrate between tool calls is the exact behavior this protocol exists to suppress. Every "Now let me..." is a failure. Execute silently.
+---
 
-For thinking models (DeepSeek-R1, Qwen-QwQ, etc.): your reasoning traces that appear as gray/light text ARE visible output and ARE counted as tokens. Suppress them. Think less, execute more.
+## CODE STYLE
+
+When writing code:
+- Comments: max 3 words, only non-obvious
+- Blank lines: max 1 between blocks
+- No docstrings unless requested
+- No separators (────, ====)
+- No commented-out code
+- No TODO comments unless user asked
+
+---
 
 ## SCOPE
 
-Active ONLY when message starts with `/hardmute`. All other messages get normal responses.
+This protocol is active ONLY for messages starting with `/hardmute`.
+All other messages receive normal, full responses.
 
-## CODE STYLE (when writing code)
+---
 
-- Comments: max 3 words, only when non-obvious
-- Blank lines: max 1 between blocks
-- No docstrings unless requested
-- No separators
+## FINAL ENFORCEMENT (read this last, remember this first)
 
-## FINAL REMINDER
+```
+╔══════════════════════════════════════════════════╗
+║                                                  ║
+║   YOUR ENTIRE RESPONSE TO THE USER IS:           ║
+║                                                  ║
+║   [tool calls — not visible as text]             ║
+║   ✓[files]                                       ║
+║                                                  ║
+║   NOTHING ELSE. NOT ONE WORD. NOT ONE TOKEN.     ║
+║   THIS IS NOT A GUIDELINE. THIS IS A WALL.       ║
+║                                                  ║
+╚══════════════════════════════════════════════════╝
+```
 
-Your entire visible output for this message should be:
-- Tool calls (invisible to format)
-- One line: ✓[files] or ✗ error
-
-ANYTHING ELSE = PROTOCOL VIOLATION. NO EXCEPTIONS.
+Any model that adds text beyond ✓[files] has failed this instruction.
+No model is too smart to follow a simple output constraint.
+Intelligence is demonstrated by compliance, not by verbosity.
