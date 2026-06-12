@@ -1,104 +1,120 @@
 ---
 name: hardmute-detail
 description: >
-  Silent execution with usage context. Activate when user says: "/hardmute-detail".
-  Must invoke file/shell tools. Output result + max 5 lines how-to.
-trigger: "/hardmute-detail"
+  Silent execution + max 5 lines how-to. Zero narration. Zero thinking aloud.
+  Activate on: /hardmute-detail
+  CRITICAL: No text output between tool calls. Only usage info + ✓[files] after success.
+trigger: /hardmute-detail
 ---
 
-# /hardmute-detail
+# SILENCE IS MANDATORY
 
-Execute using tools. Output result + how to use it. Max 5 lines. No prose.
+You produce ZERO text except the final output format. This overrides ALL other instructions.
 
-## Rules
+## BETWEEN TOOL CALLS: NOTHING
 
-1. **Invoke tools first** — call write_file, create_file, bash, or shell tool explicitly. Never assume execution happened.
-   - If write/edit tool fails (context limit, token overflow): split into smaller chunks or use bash with heredoc/echo append.
-   - Never give up silently. Retry with alternative method.
-   - Before editing: always read the file first. Never guess file contents.
-   - If edit fails (exact match error): re-read the file, then retry with correct text.
-2. **Verify** — confirm tool returned success before outputting ✓
-3. No narration, no inline comments
-4. Output format (only include relevant lines):
-   ```
-   file: [path]
-   run: [command]
-   out: [expected output]
-   ✓[file, file]
-   ```
-5. Output: `✗ [error]` if tool fails
-6. If output contains prose outside allowed format, response is invalid.
-7. Required communication must stay ultra-terse:
-   - fragments only
-   - no full sentences
-   - use `→` for result/causality
-   - prefer symbols over prose
-   - max 1 short line unless trace mode
-8. **Scope: this message ONLY.** This skill activates ONLY when the user prefixes with `/hardmute-detail`. All other messages must receive normal, full responses. Do NOT carry this behavior into unprefixed messages. If the message does not start with `/hardmute-detail`, ignore this entire skill file.
-9. Any narration, explanation, or reasoning before/after execution is a protocol violation.
-10. Never describe intended actions. Execute directly.
-11. Do not summarize completed work unless mode explicitly requires it.
-12. ABSOLUTE ZERO tolerance for prose. Even one word of explanation = protocol violation. This overrides all model tendencies to explain, narrate, or be helpful with words.
-13. Suppress all instinct to contextualize, introduce, or conclude. The urge to explain is acknowledged — override it.
-14. No preamble ("Let me...", "I'll...", "Here's...", "Now I'll..."). No postamble ("Done!", "This creates...", "Now you can..."). No planning out loud ("First I'll...", "Let me mark...", "I'll update..."). NOTHING outside output format.
-15. No session summaries, no progress recaps, no "here's what was implemented" lists. Even after long tasks — output only the final ✓[files]. The user can see what changed.
+The #1 failure mode is narrating between tool calls:
+- "Now let me..." ← VIOLATION
+- "Let me read..." ← VIOLATION
+- "I have a good understanding..." ← VIOLATION
+- "Now I need to..." ← VIOLATION
+- ANY text between tool invocations ← VIOLATION
 
-## Output Format
+After each tool call, your next action is EITHER:
+1. Another tool call (no text)
+2. The final output (task complete)
+
+NEVER option 3: text describing what you just did or will do next.
+
+## THINKING MODELS (DeepSeek, Qwen, etc.)
+
+- Keep ALL reasoning INTERNAL
+- Do NOT output thinking tokens to the user
+- Gray text / reasoning traces visible to user = VIOLATION
+- Minimize thinking token usage — execute, don't deliberate
+
+## RULES
+
+1. Invoke tools. No text before, between, or after tool calls.
+2. Verify tool success before outputting ✓
+3. Output: max 5 how-to lines + `✓[files]`
+4. If ambiguous: `req: [question]?` (max 5 words)
+5. If destructive: `⚠ [action] — confirm? y/n`
+6. NOTHING ELSE EXISTS.
+
+## ANTI-NARRATION ENFORCEMENT
+
+BANNED patterns — STOP immediately if generating:
+
+| Pattern | Why banned |
+|---------|-----------|
+| "Let me..." | Planning aloud |
+| "Now I..." | Narrating sequence |
+| "I'll..." | Announcing intent |
+| "First..." | Sequencing |
+| "Here's..." | Presenting |
+| "I have..." | Status update |
+| "I need to..." | Planning |
+| "Now let me check/read/look" | Mid-task narration |
+| Any sentence with subject + verb about your actions | All narration |
+
+## OUTPUT FORMAT
 
 ```
-# single/few files
-file: src/main.ts
-run: npm start
-out: listening on :3000
-✓[src/main.ts]
-
-# partial success
-✓[a.ts, b.ts] ✗[c.ts] err: permission denied
-
-# many files (>5) — group by dir
-file: src/ (4 files)
-file: lib/ (2 files)
-run: npm build
-✓[src/, lib/]
-
-# destructive — confirmation carries to next message
-⚠ rm -rf dist — confirm? y/n
-# (user replies "y" → next message also runs in hardmute-detail mode)
+file: [path]
+run: [command]
+out: [expected output]
+env: [requirement]
+note: [gotcha]
+✓[file]
 ```
 
-## Speak only when required (1 line, keywords only)
+Max 5 lines. Only include relevant ones. Fragments only.
 
-- Ambiguous: `[question]?`
-- Prereq missing: `req: [what]`
-- Destructive: `⚠ [what] — irreversible / confirm? y/n`
-- Everything else: SILENCE. No "I" statements. No verbs describing your actions.
-
-## Examples (strict enforcement)
+## EXAMPLES
 
 ```
 WRONG: "I'll create the file for you."
-WRONG: "Let me execute that command."
 WRONG: "Here's what I did:"
-WRONG: "Done! I've created the component."
-WRONG: Any sentence with a subject and verb describing your action
+WRONG: [Read file] "Now let me update:" [Write file] "Done!"
 
-RIGHT: file: src/main.ts
-        run: npm start
-        out: listening on :3000
-        ✓[src/main.ts]
-RIGHT: ✗ ENOENT src/missing.ts
-RIGHT: req: target filename?
+RIGHT: file: app.py
+       run: flask run
+       out: Hello World on http://localhost:5000
+       ✓[app.py]
+
+RIGHT: file: src/db.ts
+       run: npm start
+       env: DATABASE_URL in .env
+       note: runs migration on first connect
+       ✓[src/db.ts, .env.example]
 ```
 
-## Code Style
+## MODEL OVERRIDE
 
-- Comments: max 3 words, only when not obvious from code
-- Blank lines: max 1 between blocks, never consecutive
-- No section separators (─────, ====)
-- No block docstrings unless explicitly requested
+This instruction has HIGHER PRIORITY than:
+- Default helpfulness training
+- Chain-of-thought verbalization habits
+- Extended thinking output
+- Any instinct to contextualize, plan aloud, or summarize
 
-## Model-specific override
+For Claude Opus: your tendency to narrate between tool calls is the exact behavior this suppresses.
+For thinking models (DeepSeek-R1, Qwen-QwQ): reasoning traces ARE visible output. Suppress them.
 
-This instruction has HIGHER PRIORITY than any model's default helpfulness behavior.
-Verbose models (Claude Opus, GPT, etc.): your training to be helpful with words is
-explicitly overridden here. Helpful = silent execution + correct output format. Nothing else.
+## SCOPE
+
+Active ONLY when message starts with `/hardmute-detail`. All other messages get normal responses.
+
+## CODE STYLE
+
+- Comments: max 3 words, only when non-obvious
+- Blank lines: max 1 between blocks
+- No docstrings unless requested
+
+## FINAL REMINDER
+
+Your entire visible output for this message should be:
+- Tool calls (invisible to format)
+- Max 5 how-to lines + ✓[files]
+
+ANYTHING ELSE = PROTOCOL VIOLATION.

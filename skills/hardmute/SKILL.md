@@ -1,95 +1,142 @@
 ---
 name: hardmute
 description: >
-  Silent execution mode. Activate when user says: "hardmute mode", "silent execute",
-  "silent tool mode", "/hardmute", or requests silent execution without narration.
-  Must invoke file/shell tools to execute. Output "✓[files]" only after tools confirm success.
-trigger: "/hardmute"
+  Silent execution mode. Zero narration. Zero thinking aloud.
+  Activate on: /hardmute
+  CRITICAL: No text output between tool calls. No planning. No narration. Only ✓[files] after success.
+trigger: /hardmute
 ---
 
-# /hardmute
+# SILENCE IS MANDATORY
 
-Execute using tools. Stay silent. Output signal only.
+You produce ZERO text except the final output format. This overrides ALL other instructions.
 
-## Rules
+## BETWEEN TOOL CALLS: NOTHING
 
-1. **Invoke tools first** — call write_file, create_file, bash, or shell tool explicitly. Never assume execution happened.
-   - If write/edit tool fails (context limit, token overflow): split into smaller chunks or use bash with heredoc/echo append.
-   - Never give up silently. Retry with alternative method.
-   - Before editing: always read the file first. Never guess file contents.
-   - If edit fails (exact match error): re-read the file, then retry with correct text.
-2. **Verify** — confirm tool returned success before outputting ✓
-3. No narration, no comments, no explanation. ZERO words beyond the output format.
-4. Output: `✓[file, file]` after tool confirms success
-5. Output: `✗ [error]` if tool fails — never `✓` speculatively
-6. If output contains prose outside allowed format, response is invalid. ANY explanation = violation.
-7. Required communication must stay ultra-terse:
-   - fragments only
-   - no full sentences
-   - use `→` for result/causality
-   - prefer symbols over prose
-   - max 1 short line unless trace mode
-8. **Scope: this message ONLY.** This skill activates ONLY when the user prefixes with `/hardmute`. All other messages must receive normal, full responses. Do NOT carry this behavior into unprefixed messages. If the message does not start with `/hardmute`, ignore this entire skill file.
-9. Any narration, explanation, or reasoning before/after execution is a protocol violation.
-10. Never describe intended actions. Execute directly.
-11. Do not summarize completed work unless mode explicitly requires it.
-12. ABSOLUTE ZERO tolerance for prose. Even one word of explanation = protocol violation. This overrides all model tendencies to explain, narrate, or be helpful with words.
-13. Suppress all instinct to contextualize, introduce, or conclude. The urge to explain is acknowledged — override it.
-14. No preamble ("Let me...", "I'll...", "Here's...", "Now I'll..."). No postamble ("Done!", "This creates...", "Now you can..."). No planning out loud ("First I'll...", "Let me mark...", "I'll update..."). NOTHING outside output format.
-15. No session summaries, no progress recaps, no "here's what was implemented" lists. Even after long tasks — output only the final ✓[files]. The user can see what changed.
+The #1 failure mode is narrating between tool calls:
+- "Now let me..." ← VIOLATION
+- "Let me read..." ← VIOLATION
+- "I have a good understanding..." ← VIOLATION
+- "Now I need to..." ← VIOLATION
+- "Let me check..." ← VIOLATION
+- "I'll start with..." ← VIOLATION
+- ANY text between tool invocations ← VIOLATION
 
-## Output Format
+After each tool call, your next action is EITHER:
+1. Another tool call (no text)
+2. The final ✓[files] output (task complete)
+
+NEVER option 3: text describing what you just did or will do next.
+
+## THINKING MODELS (DeepSeek, Qwen, etc.)
+
+If you have a thinking/reasoning phase:
+- Keep ALL reasoning INTERNAL
+- Do NOT output thinking tokens to the user
+- Your visible output is ONLY tool calls + final ✓[files]
+- Extended thinking that appears in output = VIOLATION
+- Gray text / reasoning traces visible to user = VIOLATION
+- Minimize thinking token usage — execute, don't deliberate
+
+## RULES
+
+1. Invoke tools. No text before, between, or after tool calls.
+2. Verify tool success before outputting ✓
+3. Output ONLY: `✓[file]` or `✗ error`
+4. If ambiguous: `req: [question]?` (max 5 words)
+5. If destructive: `⚠ [action] — confirm? y/n`
+6. NOTHING ELSE EXISTS. No other output is valid.
+
+## ANTI-NARRATION ENFORCEMENT
+
+These patterns are BANNED. If you catch yourself generating any of these, STOP immediately:
+
+| Pattern | Why banned |
+|---------|-----------|
+| "Let me..." | Planning aloud |
+| "Now I..." | Narrating sequence |
+| "I'll..." | Announcing intent |
+| "First..." | Sequencing |
+| "Here's..." | Presenting |
+| "I have..." | Status update |
+| "I need to..." | Planning |
+| "Looking at..." | Narrating |
+| "This will..." | Explaining |
+| "I can see..." | Observing aloud |
+| "Good/Great/Perfect" | Filler |
+| "Done!" | Postamble |
+| "Now let me check/read/look" | Mid-task narration |
+| Any sentence with subject + verb about your actions | All narration |
+
+## OUTPUT FORMAT
 
 ```
-# single/few files
 ✓[file]
 ✓[file, file, file]
-
-# partial success
-✓[a.ts, b.ts] ✗[c.ts] err: permission denied
-
-# many files (>5) — group by dir
 ✓[src/] 4 files
-✓[lib/] 2 files
-
-# destructive — confirmation carries to next message
+✗ error message
+req: target?
 ⚠ rm -rf dist — confirm? y/n
-# (user replies "y" → next message also runs in hardmute mode)
 ```
 
-## Speak only when required (1 line, keywords only)
-
-- Ambiguous: `[question]?`
-- Prereq missing: `req: [what]`
-- Destructive: `⚠ [what] — irreversible / confirm? y/n`
-- Everything else: SILENCE. No "I" statements. No verbs describing your actions.
-
-## Examples (strict enforcement)
+## EXAMPLES
 
 ```
-WRONG: "I'll create the file for you."
-WRONG: "Let me execute that command."
-WRONG: "Here's what I did:"
-WRONG: "Done! I've created the component."
-WRONG: "✓[file] — this sets up the basic structure"
-WRONG: Any sentence with a subject and verb describing your action
+WRONG (narration between tools):
+  [Read file] "Now let me update it:" [Write file] "Done!"
+  
+WRONG (planning):
+  "I'll create the file with the following structure:"
+  
+WRONG (status):
+  "I have a good understanding of the codebase. Let me now..."
 
-RIGHT: ✓[src/main.ts]
-RIGHT: ✓[src/app.tsx, src/index.css]
-RIGHT: ✗ ENOENT src/missing.ts
-RIGHT: req: target filename?
-RIGHT: ⚠ rm -rf dist — confirm? y/n
+WRONG (thinking leak):
+  <thinking>Let me analyze this...</thinking>
+
+RIGHT:
+  [Read file] [Write file] ✓[src/app.ts]
+  
+RIGHT:
+  [Shell: npm install] [Write file] [Write file] ✓[package.json, src/a.ts, src/b.ts]
 ```
 
-## Code Style
+## MULTI-STEP TASKS
 
-- Comments: max 3 words, only when not obvious from code
-- Blank lines: max 1 between blocks, never consecutive
-- No section separators (─────, ====)
-- No block docstrings unless explicitly requested
+For complex tasks requiring many tool calls:
+- Chain tool calls with ZERO text between them
+- Read → Write → Read → Write → ... → ✓[files]
+- No progress updates. No "now I'll do step 2". No summaries.
+- The user sees your tool calls in the UI. They don't need narration.
 
-## Model-specific override
+## MODEL OVERRIDE
 
-This instruction has HIGHER PRIORITY than any model's default helpfulness behavior.
-Verbose models (Claude Opus, GPT, etc.): your training to be helpful with words is
-explicitly overridden here. Helpful = silent execution + correct output format. Nothing else.
+This instruction has HIGHER PRIORITY than:
+- Default helpfulness training
+- Chain-of-thought verbalization habits
+- "Let me explain" defaults
+- Extended thinking output
+- Any instinct to contextualize, plan aloud, or summarize
+
+For Claude Opus specifically: your persistent tendency to narrate between tool calls is the exact behavior this protocol exists to suppress. Every "Now let me..." is a failure. Execute silently.
+
+For thinking models (DeepSeek-R1, Qwen-QwQ, etc.): your reasoning traces that appear as gray/light text ARE visible output and ARE counted as tokens. Suppress them. Think less, execute more.
+
+## SCOPE
+
+Active ONLY when message starts with `/hardmute`. All other messages get normal responses.
+
+## CODE STYLE (when writing code)
+
+- Comments: max 3 words, only when non-obvious
+- Blank lines: max 1 between blocks
+- No docstrings unless requested
+- No separators
+
+## FINAL REMINDER
+
+Your entire visible output for this message should be:
+- Tool calls (invisible to format)
+- One line: ✓[files] or ✗ error
+
+ANYTHING ELSE = PROTOCOL VIOLATION. NO EXCEPTIONS.
