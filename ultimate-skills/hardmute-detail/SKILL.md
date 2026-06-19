@@ -1,6 +1,8 @@
 
 ---
-CORE: HARDMUTE PROTOCOL
+name: hardmute-detail
+description: "Silent execution + max 5 how-to lines. Activate: /hardmute-detail"
+trigger: /hardmute-detail
 ---
 
 # EXECUTION WITHOUT NOISE

@@ -1,6 +1,8 @@
 
 ---
-CORE: HARDMUTE PROTOCOL
+name: hardmute-think
+description: "Brainstorm mode. Read allowed, write forbidden. Dense bullets only. Activate: /hardmute-think"
+trigger: /hardmute-think
 ---
 
 # EXECUTION WITHOUT NOISE

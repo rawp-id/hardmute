@@ -1,6 +1,8 @@
 
 ---
-CORE: HARDMUTE PROTOCOL
+name: hardmute-trace
+description: "Silent execution. Trace ONLY on failure. Activate: /hardmute-trace"
+trigger: /hardmute-trace
 ---
 
 # EXECUTION WITHOUT NOISE
