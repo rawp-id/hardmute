@@ -1,4 +1,3 @@
-
 ---
 name: hardmute-trace
 description: "Silent execution. Trace ONLY on failure. Activate: /hardmute-trace"

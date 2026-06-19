@@ -1,4 +1,3 @@
-
 ---
 name: hardmute
 description: "Silent execution. Zero text output except ✓[files]. Activate: /hardmute"

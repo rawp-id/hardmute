@@ -1,4 +1,3 @@
-
 ---
 name: hardmute-info
 description: "Silent execution + max 2 info lines. Activate: /hardmute-info"
