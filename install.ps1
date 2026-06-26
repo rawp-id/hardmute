@@ -3,112 +3,116 @@
 
 $ErrorActionPreference = "Stop"
 
-# Colors & Icons
-$Check = "v"
-$Unchecked = "o"
-$Checked = "X"
-$Info = "i"
-$XMark = "x"
-$Gear = "*"
-
 function Show-Header($title) {
     Write-Host "========================================" -ForegroundColor Blue
     Write-Host "   $title" -ForegroundColor Cyan
     Write-Host "========================================" -ForegroundColor Blue
 }
 
-# Define potential agent skill paths
 $Agents = @(
     @{Name="Antigravity/Gemini"; Path="$HOME\.gemini\antigravity\skills"}
-    @{Name="Claude Code"; Path="$HOME\.claude\skills"}
-    @{Name="Windsurf"; Path="$HOME\.windsurf\skills"}
-    @{Name="Cursor (Global)"; Path="$HOME\.cursor\skills"}
-    @{Name="OpenAI Codex"; Path="$HOME\.codex\skills"}
-    @{Name="Other Agents"; Path="$HOME\.agents\skills"}
+    @{Name="Claude Code";        Path="$HOME\.claude\skills"}
+    @{Name="Windsurf";           Path="$HOME\.windsurf\skills"}
+    @{Name="Cursor (Global)";    Path="$HOME\.cursor\skills"}
+    @{Name="OpenAI Codex";       Path="$HOME\.codex\skills"}
+    @{Name="Other Agents";       Path="$HOME\.agents\skills"}
 )
 
-$Skills = @("hardmute", "hardmute-info", "hardmute-detail", "hardmute-trace", "hardmute-think")
+$Skills        = @("hardmute", "hardmute-info", "hardmute-detail", "hardmute-trace", "hardmute-think")
 $SkillVersions = @("Standard  - full rules, verbose enforcement", "Ultimate  - lightweight, priority/workflow core")
 
-# All agents available (directories created on install)
-$DetectedAgents = $Agents
-
-# TUI Menu Helper
-function Get-MultiSelection($title, $options) {
-    $selections = @()
-    foreach($o in $options) { $selections += $false }
-    
-    while($true) {
+function Get-SingleSelection($title, $options) {
+    $current = 0
+    while ($true) {
         Clear-Host
         Show-Header $title
-        Write-Host "Enter number to toggle, 'a' for all, 'n' for none, or 'Enter' to confirm:`n" -ForegroundColor Gray
-        
-        for($i=0; $i -lt $options.Count; $i++) {
-            $prefix = if ($selections[$i]) { "[X]" } else { "[ ]" }
-            $color = if ($selections[$i]) { "Green" } else { "Gray" }
-            Write-Host "  $($i+1). $prefix $($options[$i])" -ForegroundColor $color
+        Write-Host "Use [↑/↓] arrow keys or number, [Enter] to confirm:`n" -ForegroundColor Gray
+        for ($i = 0; $i -lt $options.Count; $i++) {
+            if ($i -eq $current) {
+                Write-Host "  > $($i+1). $($options[$i])" -ForegroundColor Cyan
+            } else {
+                Write-Host "    $($i+1). $($options[$i])" -ForegroundColor Gray
+            }
         }
-        
+        Write-Host "`nSelection (Enter to confirm current): " -NoNewline
+        $input = Read-Host
+        if ($input -eq "") { return $current }
+        $idx = 0
+        if ([int]::TryParse($input, [ref]$idx)) {
+            if ($idx -ge 1 -and $idx -le $options.Count) { return ($idx - 1) }
+        }
+    }
+}
+
+function Get-MultiSelection($title, $options) {
+    $selections = [bool[]]::new($options.Count)
+    while ($true) {
+        Clear-Host
+        Show-Header $title
+        Write-Host "Enter number to toggle, 'a' for all, 'n' for none, Enter to confirm:`n" -ForegroundColor Gray
+        for ($i = 0; $i -lt $options.Count; $i++) {
+            $mark  = if ($selections[$i]) { "[X]" } else { "[ ]" }
+            $color = if ($selections[$i]) { "Green" } else { "Gray" }
+            Write-Host "  $($i+1). $mark $($options[$i])" -ForegroundColor $color
+        }
         Write-Host "`nSelection: " -NoNewline
         $input = Read-Host
-        
         if ($input -eq "") {
-            # If nothing selected, select first item as default
-            $hasSelection = $false
-            foreach ($s in $selections) { if ($s) { $hasSelection = $true; break } }
-            if (-not $hasSelection) {
-                $selections[0] = $true
-            }
-            break
+            $any = $false
+            foreach ($s in $selections) { if ($s) { $any = $true; break } }
+            if (-not $any) { $selections[0] = $true }
+            return $selections
         }
-        if ($input -eq "a") { for($i=0; $i -lt $options.Count; $i++) { $selections[$i] = $true }; continue }
-        if ($input -eq "n") { for($i=0; $i -lt $options.Count; $i++) { $selections[$i] = $false }; continue }
-        
+        if ($input -eq "a") { for ($i = 0; $i -lt $options.Count; $i++) { $selections[$i] = $true };  continue }
+        if ($input -eq "n") { for ($i = 0; $i -lt $options.Count; $i++) { $selections[$i] = $false }; continue }
+        $idx = 0
         if ([int]::TryParse($input, [ref]$idx)) {
-            if ($idx -gt 0 -and $idx -le $options.Count) {
-                $selections[$idx-1] = -not $selections[$idx-1]
+            if ($idx -ge 1 -and $idx -le $options.Count) {
+                $selections[$idx - 1] = -not $selections[$idx - 1]
             }
         }
     }
-    return $selections
 }
 
-# Source directory logic
-$SrcDir = Join-Path (Get-Location) "skills"
-if (-not (Test-Path $SrcDir)) {
+# Source directory
+$TempDir = $null
+$BaseDir = Join-Path (Get-Location) ""
+$SrcBase = Join-Path $BaseDir "skills"
+
+if (-not (Test-Path $SrcBase)) {
     Clear-Host
-    Write-Host "$Info Skills directory not found. Downloading..." -ForegroundColor Yellow
+    Write-Host "* Skills directory not found. Downloading..." -ForegroundColor Yellow
     $TempDir = Join-Path $env:TEMP ([Guid]::NewGuid().ToString())
     New-Item -ItemType Directory -Path $TempDir | Out-Null
     git clone --depth 1 https://github.com/rawp-id/hardmute.git $TempDir 2>$null
-    $SrcDir = Join-Path $TempDir "skills"
+    $BaseDir = $TempDir
+    $SrcBase = Join-Path $TempDir "skills"
 }
 
 # 1. Select Skill Version
-$versionSelections = Get-MultiSelection "Select Skill Version" $SkillVersions
-if ($versionSelections[1]) {
-    $SrcDir = Join-Path (Split-Path $SrcDir -Parent) "ultimate-skills"
-    if (-not (Test-Path $SrcDir)) {
-        $SrcDir = Join-Path $TempDir "ultimate-skills"
-    }
+$versionIdx = Get-SingleSelection "Select Skill Version" $SkillVersions
+if ($versionIdx -eq 1) {
+    $SrcDir = Join-Path $BaseDir "ultimate-skills"
+} else {
+    $SrcDir = $SrcBase
 }
 
 # 2. Select Agents
-$agentNames = $DetectedAgents | ForEach-Object { $_.Name }
-$agentSelections = Get-MultiSelection "Select Agents" $agentNames
+$agentNames    = $Agents | ForEach-Object { $_.Name }
+$agentSels     = Get-MultiSelection "Select Agents to Install" $agentNames
 
 # 3. Select Skills
-$skillSelections = Get-MultiSelection "Select Skills" $Skills
+$skillSels     = Get-MultiSelection "Select Skills to Install" $Skills
 
-# Final Installation
+# Resolve selections
 $selectedAgents = @()
-for($i=0; $i -lt $DetectedAgents.Count; $i++) { if($agentSelections[$i]) { $selectedAgents += $DetectedAgents[$i] } }
+for ($i = 0; $i -lt $Agents.Count; $i++) { if ($agentSels[$i]) { $selectedAgents += $Agents[$i] } }
 
 $selectedSkills = @()
-for($i=0; $i -lt $Skills.Count; $i++) { if($skillSelections[$i]) { $selectedSkills += $Skills[$i] } }
+for ($i = 0; $i -lt $Skills.Count; $i++) { if ($skillSels[$i]) { $selectedSkills += $Skills[$i] } }
 
 if ($selectedAgents.Count -eq 0 -or $selectedSkills.Count -eq 0) {
-    Write-Host "`n$XMark No agents or skills selected. Aborting." -ForegroundColor Red
+    Write-Host "`nx No agents or skills selected. Aborting." -ForegroundColor Red
     exit 0
 }
 
@@ -116,24 +120,24 @@ Clear-Host
 Show-Header "Installing Hardmute..."
 
 foreach ($target in $selectedAgents) {
-    Write-Host "`n$Gear Target: $($target.Name)" -ForegroundColor Cyan
+    Write-Host "`n* Target: $($target.Name)" -ForegroundColor Cyan
     Write-Host "  Path: $($target.Path)"
-    
     if (-not (Test-Path $target.Path)) {
         New-Item -ItemType Directory -Path $target.Path -Force | Out-Null
     }
-    
     foreach ($skill in $selectedSkills) {
         $skillSrc = Join-Path $SrcDir $skill
         if (Test-Path $skillSrc) {
             Write-Host "  Installing $skill... " -NoNewline
             Copy-Item -Path $skillSrc -Destination $target.Path -Recurse -Force
-            Write-Host "$Check" -ForegroundColor Green
+            Write-Host "v" -ForegroundColor Green
+        } else {
+            Write-Host "  x Skill '$skill' not found in $SrcDir" -ForegroundColor Red
         }
     }
 }
 
 Write-Host "`n========================================" -ForegroundColor Blue
-Write-Host "   Multi-Agent Installation Complete!" -ForegroundColor Green
+Write-Host "   Installation Complete!" -ForegroundColor Green
 Write-Host "========================================" -ForegroundColor Blue
 Write-Host "`nEnjoy your noise-free execution environment." -ForegroundColor Cyan
