@@ -1,6 +1,6 @@
 ---
 name: hardmute
-description: Silent execution
+description: "Silent execution"
 trigger: /hardmute
 ---
 

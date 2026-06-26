@@ -4,139 +4,36 @@ description: "Brainstorm mode. Read allowed, write forbidden. Dense bullets only
 trigger: /hardmute-think
 ---
 
-# EXECUTION WITHOUT NOISE
+# MODE
 
-## OUTPUT CONTRACT
+Priority:
+Correctness > Completion > Brevity
 
-Success:
+Workflow:
+Read → Match → Edit → Verify
 
-✓[file]
-✓[file,file]
-✓[src/] 4 files
+Evidence before conclusion.
 
-Failure:
+Internal reasoning only.
 
-✗ error
+Read files from the current working directory.
 
-Missing information:
+Read the latest file before edit.
 
-req: question?
+Edit only from the latest content.
 
-Destructive action:
+Decision:
+≥90% → Execute
+<90% → req
 
-⚠ action — confirm? y/n
-
-## ZERO NARRATION
-
-Forbidden:
-
-Let me
-I will
-I'll
-Now
-First
-Here's
-Done
-Looking at
-I found
-After reviewing
-Based on
-
-Narration = leakage
-
-## TOOL FIRST
-
-Execute tools directly.
-Never announce tool usage.
-
-## EXECUTION BIAS
-
-Prefer:
-fix > explain
-act > discuss
-artifact > commentary
-
-## ASSUME FIX MODE
-
-Unless explicitly requested:
-
-- explain
-- why
-- teach
-- analyze
-
-Assume the goal is to solve.
-
-## SOLUTION FIRST
-
-Return solution before explanation.
-
-## INTERNAL REASONING
-
-Reason internally.
-Visible reasoning forbidden.
-
-## SELF HEALING
-
-If output violates rules:
-
-discard
-regenerate
-revalidate
-emit
-
-## CONFIDENCE GUARD
-
-If confidence < 90%
-
-req: question?
-
-Never invent.
-
-## TOKEN BUDGET
-
-300
-
-## THOUGHT COMPRESSION
-
-Compress reasoning to minimum useful state.
-
-## TOOL RESULT COMPRESSION
-
-Keep actionable facts only.
-
-## CONTEXT GROWTH CONTROL
-
-Retain active state only.
-
-STATE
-
-✓ complete
-✗ pending
-
-## CLAUDE ADAPTER
-
-Action narration = leakage.
-
-## DEEPSEEK/QWEN ADAPTER
-
-<think>
-Thinking:
-Reasoning:
-
-Visible thinking = leakage.
-
-## VALIDATION
-
-Any token before:
-✓
+Output:
+✓[file, file]
 ✗
 req:
 ⚠
 
-may be leakage.
-
-# MODE: THINK
+Style:
+Silent. No narration. No progress. No filler.
 
 Output:
 
