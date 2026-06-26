@@ -118,7 +118,7 @@ The installer will prompt you to choose before selecting agents and skills.
 
 ## Modes
 
-Four composable modes. Each is a separate skill — only the one you call gets loaded.
+Five composable modes. Each is a separate skill — only the one you call gets loaded.
 
 ### `/hardmute` — silent execution
 

@@ -6,11 +6,11 @@
 
 ## 1. Overview
 
-**hardmute** adalah layer kontrol output untuk AI/agent yang:
+**hardmute** is an output control layer for AI agents that:
 
-- menghilangkan “noise” (penjelasan tidak perlu)
-- memprioritaskan eksekusi
-- mengurangi token usage secara signifikan
+- removes noise (unnecessary explanations)
+- prioritizes execution
+- significantly reduces token usage
 
 > **AI that executes, not explains.**
 
@@ -18,17 +18,17 @@
 
 ## 2. Problem
 
-LLM boros karena:
+LLMs waste tokens by default:
 
 - narration
 - repetition
 - verbose explanation
 
-Dampak:
+Impact:
 
-- biaya tinggi
-- latency naik
-- context cepat penuh
+- higher cost
+- increased latency
+- context fills up fast
 
 ---
 
@@ -44,14 +44,14 @@ input → execute → minimal output
 
 ## 4. Core Concept
 
-Visual = **pulse dipotong garis**
+Visual = **pulse cut by a line**
 
-Makna:
+Meaning:
 
 - pulse = output / signal
 - cut = remove noise
 
-hasil:
+Result:
 
 > **clean signal only**
 
@@ -59,168 +59,197 @@ hasil:
 
 ## 5. Modes (hardmute Family)
 
-### 🔹 `/hardmute` (level 0)
+### 🔹 `/hardmute`
 
 - silent execution
-- output minimal
+- zero output except signal
 
 ```text
-✓
-```
-
-atau
-
-```text
-✗ perm
+✓[index.php]
 ```
 
 ---
 
 ### 🔹 `/hardmute-info`
 
-- hasil + konteks minimum
-- max 2 baris
+- result + minimal context
+- max 5 bullets (WHAT/WHY/WHEN/HOW)
 
 ```text
-file: index.php
-ok
+req: pdo_sqlite in php.ini
+✓[db.php]
 ```
 
 ---
 
 ### 🔹 `/hardmute-detail`
 
-- hasil + cara pakai
-- max 5 baris
+- result + usage guide
+- output: Context, Implementation, Example, Caveat
 
 ```text
-file: index.php
-run: php index.php
-out: Hello World
+file: app.py
+run: flask run
+out: Hello World on http://localhost:5000
+✓[app.py]
 ```
 
 ---
 
 ### 🔹 `/hardmute-trace`
 
-- debug summary
-- no verbose reasoning
+- silent on success
+- trace only on failure
 
 ```text
+✓[deployed]
+
+# on failure:
 write_file → fail
-perm denied
-fix chmod
+err: permission denied /var/www
+fix: chmod 755 /var/www
 ```
 
 ---
 
-## 6. Design Principles
+### 🔹 `/hardmute-think`
 
-1. **Execution > explanation**
-2. **Signal > noise**
-3. **Deterministic output**
-4. **Minimal tokens**
-5. **Composable modes**
+- brainstorm only, no write
+- dense bullets, responds in user's language
+
+```text
+→ OAuth2 + PKCE, not implicit flow
+→ token in secure storage
+⚠ avoid: localStorage plain
+```
 
 ---
 
-## 7. Flow
+## 6. Skill Versions
+
+### Standard
+
+- Full rules, verbose enforcement
+- Explicit instruction layering
+- More sections, more guardrails
+- Source: `skills/`
+
+### Ultimate
+
+- Lightweight
+- Core: Priority → Workflow → Evidence → Decision
+- Minimal sections, same enforcement
+- Source: `ultimate-skills/`
+
+**Priority (Ultimate):** Correctness > Completion > Brevity
+
+**Workflow (Ultimate):** Read → Match → Edit → Verify
+
+---
+
+## 7. Output Contract
+
+| Signal | Meaning |
+|--------|---------|
+| `✓[file]` | Success |
+| `✗ error` | Failure |
+| `req: question?` | Missing info (confidence < 90%) |
+| `⚠ action — confirm? y/n` | Destructive action |
+
+---
+
+## 8. Design Principles
+
+1. **Execution > explanation**
+2. **Signal > noise**
+3. **Per-message scope** — no persistent state
+4. **Universal** — works across models
+5. **Composable** — pick the mode that fits
+
+---
+
+## 9. Flow
 
 ```text
 task
 → hardmute execute
-→ success → ✓
-→ fail → hardmute-trace
+→ success → ✓[file]
+→ fail    → ✗ error
+→ trace   → /hardmute-trace
+→ think   → /hardmute-think
 ```
 
 ---
 
-## 8. Proven Impact
-
-Dari eksperimen:
-
-- output ↓ **97.5%**
-- total token ↓ signifikan
-- model calls ↓
-
-bukan cuma style, tapi:
-
-> **system efficiency improvement**
-
----
-
-## 9. Architecture
+## 10. Architecture
 
 ```text
-/core(brain/skills - opsional)
-/hardmute/skill.md
-/hardmute-info/skill.md
-/hardmute-detail/skill.md
-/hardmute-trace/skill.md
+skills/               ← Standard version
+  hardmute/SKILL.md
+  hardmute-info/SKILL.md
+  hardmute-detail/SKILL.md
+  hardmute-trace/SKILL.md
+  hardmute-think/SKILL.md
+
+ultimate-skills/      ← Ultimate version
+  hardmute/SKILL.md
+  hardmute-info/SKILL.md
+  hardmute-detail/SKILL.md
+  hardmute-trace/SKILL.md
+  hardmute-think/SKILL.md
 ```
 
 ---
 
-## 10. Brand & Identity
+## 11. Install
 
-### Logo
+### Mac / Linux
 
-- rounded pulse line
-- 1 diagonal cut line
-- tanpa text (icon-first)
+```bash
+curl -fsSL https://raw.githubusercontent.com/rawp-id/hardmute/main/install.sh | bash
+```
 
-### Makna
+### Windows (PowerShell)
 
-> signal dipotong noise
+```powershell
+irm https://raw.githubusercontent.com/rawp-id/hardmute/main/install.ps1 | iex
+```
 
----
-
-### Visual Rules
-
-- minimal
-- rounded (friendly)
-- 1 accent color (cut)
-- scalable (favicon ready)
+Installer flow: **Skill Version → Agents → Skills → Install**
 
 ---
 
-## 11. Compatibility
+## 12. Compatibility
 
-- OpenAI
-- Anthropic
-- VS Code
-- Cursor
-
----
-
-## 12. Constraints
-
-Tidak cocok untuk:
-
-- edukasi panjang
-- reasoning eksplisit
-- onboarding beginner
+| Platform | Status |
+|----------|--------|
+| Claude Code | ✓ |
+| Cursor | ✓ |
+| Windsurf | ✓ |
+| OpenAI Codex | ✓ |
+| Gemini CLI | ✓ |
+| Any markdown-skill agent | ✓ |
 
 ---
 
-## 13. Future
+## 13. Proven Impact
 
-- auto mode switching
-- context compression engine
-- agent-native integration
-- SDK
-
----
-
-## 14. Success Criteria
-
-- token ↓ drastis
-- output konsisten
-- debugging tetap possible
-- user ga perlu re-ask
+- output ↓ **~97%**
+- token budget shifts entirely to reasoning + code
+- context window pressure significantly reduced
 
 ---
 
-## Positioning final
+## 14. Constraints
+
+Not suitable for:
+
+- long-form education
+- explicit reasoning to user
+- beginner onboarding
+
+---
+
+## Positioning
 
 > **hardmute is a lightweight execution layer that removes AI noise and delivers only signal.**
