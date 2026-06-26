@@ -101,9 +101,18 @@ curl -fsSL https://raw.githubusercontent.com/rawp-id/hardmute/main/install.sh | 
 irm https://raw.githubusercontent.com/rawp-id/hardmute/main/install.ps1 | iex
 ```
 
-Interactive TUI installer — pick your agents, pick your skills, done.
+Interactive TUI installer — pick your skill version, pick your agents, pick your skills, done.
 
 Works with any agent that reads markdown skill files.
+
+### Skill Versions
+
+| Version | Description |
+|---------|-------------|
+| Standard | Full rules, verbose enforcement. More explicit instruction layering. |
+| Ultimate | Lightweight. Priority ordering, read→edit workflow, evidence-first reasoning. |
+
+The installer will prompt you to choose before selecting agents and skills.
 
 ---
 

@@ -29,6 +29,7 @@ ARROW="➜"
 AGENT_NAMES=("Antigravity/Gemini" "Claude Code" "Windsurf" "Cursor (Global)" "OpenAI Codex" "Other Agents")
 AGENT_PATHS=("$HOME/.gemini/antigravity/skills" "$HOME/.claude/skills" "$HOME/.windsurf/skills" "$HOME/.cursor/skills" "$HOME/.codex/skills" "$HOME/.agents/skills")
 SKILLS=("hardmute" "hardmute-info" "hardmute-detail" "hardmute-trace" "hardmute-think")
+SKILL_VERSIONS=("Standard  — full rules, verbose enforcement" "Ultimate  — lightweight, priority/workflow core")
 
 # All agents available (directories created on install)
 DETECTED_NAMES=("${AGENT_NAMES[@]}")
@@ -134,7 +135,17 @@ if [ ! -d "$SRC_DIR" ]; then
     trap 'rm -rf "$TEMP_DIR"' EXIT
 fi
 
-# 1. Select Agents
+# 1. Select Skill Version
+multi_select "Select Skill Version" "${SKILL_VERSIONS[@]}"
+if [ "${RET_SELECTIONS[1]}" == "1" ]; then
+    SRC_DIR="$(dirname "$SRC_DIR")/ultimate-skills"
+    if [ ! -d "$SRC_DIR" ]; then
+        # Try fetching if cloned from remote
+        SRC_DIR="${TEMP_DIR:-$SCRIPT_DIR}/ultimate-skills"
+    fi
+fi
+
+# 2. Select Agents
 multi_select "Select Agents to Install" "${DETECTED_NAMES[@]}"
 SELECTED_AGENT_NAMES=()
 SELECTED_AGENT_PATHS=()
@@ -145,7 +156,7 @@ for i in "${!RET_SELECTIONS[@]}"; do
     fi
 done
 
-# 2. Select Skills
+# 3. Select Skills
 multi_select "Select Skills to Install" "${SKILLS[@]}"
 SELECTED_SKILLS=()
 for i in "${!RET_SELECTIONS[@]}"; do

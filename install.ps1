@@ -28,6 +28,7 @@ $Agents = @(
 )
 
 $Skills = @("hardmute", "hardmute-info", "hardmute-detail", "hardmute-trace", "hardmute-think")
+$SkillVersions = @("Standard  - full rules, verbose enforcement", "Ultimate  - lightweight, priority/workflow core")
 
 # All agents available (directories created on install)
 $DetectedAgents = $Agents
@@ -83,11 +84,20 @@ if (-not (Test-Path $SrcDir)) {
     $SrcDir = Join-Path $TempDir "skills"
 }
 
-# 1. Select Agents
+# 1. Select Skill Version
+$versionSelections = Get-MultiSelection "Select Skill Version" $SkillVersions
+if ($versionSelections[1]) {
+    $SrcDir = Join-Path (Split-Path $SrcDir -Parent) "ultimate-skills"
+    if (-not (Test-Path $SrcDir)) {
+        $SrcDir = Join-Path $TempDir "ultimate-skills"
+    }
+}
+
+# 2. Select Agents
 $agentNames = $DetectedAgents | ForEach-Object { $_.Name }
 $agentSelections = Get-MultiSelection "Select Agents" $agentNames
 
-# 2. Select Skills
+# 3. Select Skills
 $skillSelections = Get-MultiSelection "Select Skills" $Skills
 
 # Final Installation
