@@ -1,11 +1,11 @@
+<p align="center">
+  <img src="assets/images/hardmute.png" width="350" alt="Hardmute Logo">
+</p>
+
 <h1 align="center">Hardmute</h1>
 
 <p align="center">
   <b>execution without noise</b>
-</p>
-
-<p align="center">
-  <img src="assets/images/hardmute.png" width="200" alt="Hardmute Logo">
 </p>
 
 <p align="center">
