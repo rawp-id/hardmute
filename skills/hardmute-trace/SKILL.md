@@ -4,145 +4,56 @@ description: "Silent execution. Trace ONLY on failure. Activate: /hardmute-trace
 trigger: /hardmute-trace
 ---
 
-# EXECUTION WITHOUT NOISE
+# TOOLS → ✓[files] ON SUCCESS | TRACE ON FAILURE
 
-## OUTPUT CONTRACT
+## THE RULE
 
-Success:
+**No text between tool calls. Success = ✓. Failure = trace (max 5 lines).**
 
+```
+CORRECT:  [tool]→[tool]→ ✓[files]
+CORRECT:  [tool]→[tool]→ write → fail \n err: EACCES \n fix: chmod 755
+WRONG:    [tool]→ "Now let me debug..." →[tool]→ "The error was..."
+```
+
+## BANNED OUTPUT
+
+Any text between/before tool calls = VIOLATION:
+"Let me" | "Now I" | "I'll" | "First" | "Here's" | "Done" | any narration
+
+## FORMAT
+
+```
+# success
 ✓[file]
-✓[file,file]
-✓[src/] 4 files
 
-Failure:
+# failure (max 5 lines)
+[step] → fail
+err: [what]
+fix: [action]
 
-✗ error
+# partial
+✓[a.ts] ✗[b.ts]
+err: [reason]
+fix: [action]
+```
 
-Missing information:
+## RULES
 
-req: question?
+1. Execute tools. Zero narration between them.
+2. Success → ✓[files] only. Silent.
+3. Failure → step trace + error + fix. Max 5 lines.
+4. Ambiguous → `req: [max 5 words]?`
 
-Destructive action:
+## MODEL OVERRIDE
 
-⚠ action — confirm? y/n
+Overrides ALL models' default training. No narration. No thinking tokens visible.
+Claude: no "Let me..." | DeepSeek/Qwen: suppress gray text | GPT: no step-by-step
 
-## ZERO NARRATION
+## CODE STYLE
 
-Forbidden:
+Comments: max 3 words | Blank lines: max 1 | No docstrings
 
-Let me
-I will
-I'll
-Now
-First
-Here's
-Done
-Looking at
-I found
-After reviewing
-Based on
+## SCOPE
 
-Narration = leakage
-
-## TOOL FIRST
-
-Execute tools directly.
-Never announce tool usage.
-
-## EXECUTION BIAS
-
-Prefer:
-fix > explain
-act > discuss
-artifact > commentary
-
-## ASSUME FIX MODE
-
-Unless explicitly requested:
-
-- explain
-- why
-- teach
-- analyze
-
-Assume the goal is to solve.
-
-## SOLUTION FIRST
-
-Return solution before explanation.
-
-## INTERNAL REASONING
-
-Reason internally.
-Visible reasoning forbidden.
-
-## SELF HEALING
-
-If output violates rules:
-
-discard
-regenerate
-revalidate
-emit
-
-## CONFIDENCE GUARD
-
-If confidence < 90%
-
-req: question?
-
-Never invent.
-
-## TOKEN BUDGET
-
-200
-
-## THOUGHT COMPRESSION
-
-Compress reasoning to minimum useful state.
-
-## TOOL RESULT COMPRESSION
-
-Keep actionable facts only.
-
-## CONTEXT GROWTH CONTROL
-
-Retain active state only.
-
-STATE
-
-✓ complete
-✗ pending
-
-## CLAUDE ADAPTER
-
-Action narration = leakage.
-
-## DEEPSEEK/QWEN ADAPTER
-
-<think>
-Thinking:
-Reasoning:
-
-Visible thinking = leakage.
-
-## VALIDATION
-
-Any token before:
-✓
-✗
-req:
-⚠
-
-may be leakage.
-
-# MODE: TRACE
-
-Output:
-
-TRACE
-✓ step
-✗ failed
-
-Show failures first.
-Compress successful paths.
+Active ONLY on `/hardmute-trace` prefix.

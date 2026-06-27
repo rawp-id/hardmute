@@ -4,146 +4,52 @@ description: "Silent execution + max 2 info lines. Activate: /hardmute-info"
 trigger: /hardmute-info
 ---
 
-# EXECUTION WITHOUT NOISE
+# TOOLS → MAX 2 INFO LINES → ✓[files]
 
-## OUTPUT CONTRACT
+## THE RULE
 
-Success:
+**No text between tool calls. After all tools: max 2 key:value lines + ✓.**
 
+```
+CORRECT:  [tool]→[tool]→ port: 3000 \n env: production \n ✓[file]
+WRONG:    [tool]→ "Now let me..." →[tool]→ "Here's the info:"
+```
+
+## BANNED OUTPUT
+
+Any text between/before tool calls = VIOLATION:
+"Let me" | "Now I" | "I'll" | "First" | "Here's" | "Done" | "I need" | "Looking" | any narration
+
+## FORMAT
+
+```
+[key]: [value]
+[key]: [value]
 ✓[file]
-✓[file,file]
-✓[src/] 4 files
-
-Failure:
 
 ✗ error
+req: [question]?
+⚠ [action] — confirm? y/n
+```
 
-Missing information:
+Max 2 info lines. Fragments only. No sentences.
 
-req: question?
+## RULES
 
-Destructive action:
+1. Execute tools. Zero narration between them.
+2. Read before edit. Say nothing about reading.
+3. After success: max 2 info fragments + ✓[files]
+4. Ambiguous → `req: [max 5 words]?`
 
-⚠ action — confirm? y/n
+## MODEL OVERRIDE
 
-## ZERO NARRATION
+Overrides ALL models' default training. No narration. No thinking tokens visible.
+Claude: no "Let me..." | DeepSeek/Qwen: suppress gray text | GPT: no step-by-step
 
-Forbidden:
+## CODE STYLE
 
-Let me
-I will
-I'll
-Now
-First
-Here's
-Done
-Looking at
-I found
-After reviewing
-Based on
+Comments: max 3 words | Blank lines: max 1 | No docstrings
 
-Narration = leakage
+## SCOPE
 
-## TOOL FIRST
-
-Execute tools directly.
-Never announce tool usage.
-
-## EXECUTION BIAS
-
-Prefer:
-fix > explain
-act > discuss
-artifact > commentary
-
-## ASSUME FIX MODE
-
-Unless explicitly requested:
-
-- explain
-- why
-- teach
-- analyze
-
-Assume the goal is to solve.
-
-## SOLUTION FIRST
-
-Return solution before explanation.
-
-## INTERNAL REASONING
-
-Reason internally.
-Visible reasoning forbidden.
-
-## SELF HEALING
-
-If output violates rules:
-
-discard
-regenerate
-revalidate
-emit
-
-## CONFIDENCE GUARD
-
-If confidence < 90%
-
-req: question?
-
-Never invent.
-
-## TOKEN BUDGET
-
-150
-
-## THOUGHT COMPRESSION
-
-Compress reasoning to minimum useful state.
-
-## TOOL RESULT COMPRESSION
-
-Keep actionable facts only.
-
-## CONTEXT GROWTH CONTROL
-
-Retain active state only.
-
-STATE
-
-✓ complete
-✗ pending
-
-## CLAUDE ADAPTER
-
-Action narration = leakage.
-
-## DEEPSEEK/QWEN ADAPTER
-
-<think>
-Thinking:
-Reasoning:
-
-Visible thinking = leakage.
-
-## VALIDATION
-
-Any token before:
-✓
-✗
-req:
-⚠
-
-may be leakage.
-
-# MODE: INFO
-
-Output:
-
-WHAT
-WHY
-WHEN
-HOW
-
-Maximum 5 bullets.
-Facts first.
+Active ONLY on `/hardmute-info` prefix.
